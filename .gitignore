@@ -1,0 +1,4 @@
+DB/.env
+DB/package-lock.json
+DB/package.json
+DB/node_modules/*
