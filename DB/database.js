@@ -104,7 +104,8 @@ export async function getUsersBorrowHistory(UserID){
         SELECT 
             b.BookID,
             b.Title, 
-            b.Author, 
+            b.Author,
+            b.ImagePath, 
             bb.BorrowDate, 
             bb.ReturnDate
         FROM 
@@ -143,32 +144,83 @@ export async function registerNewUser(UserName, password){
     return true;
 }
 
-export async function subscribeNewUser(UserName, Phone, Address, Email, subscriptionLength){
-    if(await isUserExist(UserName))
+export async function subscribeNewUser(UserName, Phone, Address, Email, SubscriptionLength){
+    if(!await isUserExist(UserName))
         return false;
 
     await pool.query(
-        'INSERT INTO SubscribedUsers (Name, Phone, Address, Email, SubscriptionExpiration) VALUES (?, ?, ?, ?, ?)',
-        [UserName, Phone, Address, Email, subscriptionLength]);
+        'INSERT INTO SubscribedUsers (Name, Phone, Address, Email, SubscriptionExpiration) VALUES (?, ?, ?, ?, DATE_ADD(CURDATE(), INTERVAL ? MONTH))',
+        [UserName, Phone, Address, Email, SubscriptionLength]);
     return true;
 }
 
 // -- books
-export async function addNewBook([Title, Author, Summary, ImagePath]){
-    await pool.query('INSERT INTO Books (Title, Author, Summary, ImagePath) VALUES (?, ?, ?, ?)', [Title, Author, Summary, ImagePath]);
+export async function addNewBook({Title, Author, Summary, ImagePath}){
+    // Enforce unique book title.
+    const [rows] = await pool.query("SELECT * from Books as b WHERE b.Title = ?;", [Title]);
+    if(rows.length > 0) return false;
+
+    await pool.query('INSERT INTO Books (Title, Author, Summary, ImagePath) VALUES (?, ?, ?, ?)', [Title, Author,  Summary || null, ImagePath || null]);
+    return true;
 }
 
 export async function addNewCopyOfBook(BookID){
+    const book = await getBooksById(BookID);
+    if(book.length == 0) return false;
 
+    await pool.query(`INSERT INTO BookCopies (BookID) VALUES (?);`, [BookID]);
+    return true;
 }
 
 // -- books and users
-export async function addFavoriteBookToUser(UserName){
+export async function addFavoriteBookToUser(UserName, BookID){
+    const user = await getUserByName(UserName)
+    if(user.length === 0) return false; // user doesnt exist
+    const book = await getBooksById(BookID)
+    if(book.length === 0) return false; // book doesnt exist
 
+    const [rows] = await pool.query(
+        `SELECT 
+            COUNT(*) AS count 
+        FROM 
+            FavoriteBooks 
+        WHERE Name = ? AND BookID = ?`,
+        [UserName, BookID]);
+
+    if (rows[0].count === 0){ // the book is not in favorite
+        await pool.query(
+            'INSERT INTO FavoriteBooks (Name, BookID) VALUES (?, ?);',
+            [UserName, BookID]
+        );
+    }
+return true;
 }
 
-export async function addBorrowedBookToUser(UserName){
+export async function addBorrowedBookToUser(UserName, CopyID){
+    const user = await getUserByName(UserName)
+    if(user.length === 0) return false; // user doesnt exist
+    // check if the copy exists at all
+    // const book = await getBookCopiesByID(CopyID)
+    // console.log(book);
+    // if(book.length === 0) return false; // copy doesnt exist
 
+    // Check if the copy is already borrowed
+    const [rows] = await pool.query(`
+    SELECT 
+        COUNT(*) AS count 
+    FROM 
+        BorrowedBooks 
+    WHERE CopyID = ? AND ReturnDate IS NULL`,
+    [CopyID]);
+
+    if (rows[0].count > 0) return false;
+
+    // Insert the borrow record
+    await pool.query(
+        'INSERT INTO BorrowedBooks (Name, CopyID, BorrowDate) VALUES (?, ?, CURDATE())',
+        [UserName, CopyID]
+    );
+    return true;
 }
 
 // -- quotes
@@ -201,23 +253,88 @@ export async function updateUser(UserName, newPassword) {
 }
 
 
-export async function updateSubscribedUser(UserName, [Phone, Address, Email]){
+export async function updateSubscribedUser(UserName, {Phone, Address, Email, SubscriptionLength}){
+    let query = 'UPDATE SubscribedUsers SET ';
+    const params_list = [];
 
-}
+    if (Phone !== undefined) {
+        query += 'Phone = ?, ';
+        params_list.push(Phone);
+    }
+    if (Address !== undefined) {
+        query += 'Address = ?, ';
+        params_list.push(Address);
+    }
+    if (Email !== undefined) {
+        query += 'Email = ?, ';
+        params_list.push(Email);
+    }
+    if (SubscriptionLength !== undefined) {
+        query += 'SubscriptionExpiration = DATE_ADD(CURDATE(), INTERVAL ? MONTH), ';
+        params_list.push(SubscriptionLength);
+    }
+    console.log(query);
+    console.log(params_list);
 
-export async function updateSubscriptionExpirationDateOfUser(UserName, subscriptionLength){
-
+    if (params_list.length > 0){
+        query = query.slice(0, -2) + ' WHERE Name = ?';
+        params_list.push(UserName);
+    
+        console.log(query);
+        console.log(params_list);
+        // Execute the query
+        await pool.query(query, params_list);
+    } 
 }
 
 // -- books
-export async function updateBook(BookID, [Title, Author, Summary, ImagePath]){
+export async function updateBook(BookID, {Title, Author, Summary, ImagePath}){
+    const book = await getBooksById(BookID);
+    if(book.length == 0) return 0;
 
-    await pool.query('INSERT INTO Books (Title, Author, Summary, ImagePath) VALUES (?, ?, ?, ?)', [Title, Author, Summary, ImagePath]);
+    let query = 'UPDATE Books SET ';
+    const params_list = [];
+
+    // Add conditions to the query based on provided parameters
+    if (Title !== undefined) {
+        query += 'Title = ?, ';
+        params_list.push(Title);
+    }
+    if (Author !== undefined) {
+        query += 'Author = ?, ';
+        params_list.push(Author);
+    }
+    if (Summary !== undefined) {
+        query += 'Summary = ?, ';
+        params_list.push(Summary);
+    }
+    if (ImagePath !== undefined) {
+        query += 'ImagePath = ?, ';
+        params_list.push(ImagePath);
+    }
+
+    query = query.slice(0, -2) + ' WHERE BookID = ?';
+    params_list.push(BookID);
+    
+    await pool.query(query, params_list);
+    return true;
 }
 
 
 // -- books and users
-export async function returnBorrowedBookFromUser(UserName){
+export async function returnBorrowedBookFromUser(UserName, CopyID){
+    // Check if the borrow record exists and belongs to the specified user
+    const [rows] = await pool.query(
+        'SELECT * FROM BorrowedBooks WHERE CopyID = ? AND Name = ? AND ReturnDate IS NULL',
+        [CopyID, UserName]
+    );
+    if (rows.length === 0) return false;
+
+    // Update the ReturnDate to the current date
+    await pool.query(
+        'UPDATE BorrowedBooks SET ReturnDate = CURDATE() WHERE CopyID = ?',
+        [CopyID]
+    );
 
 }
 
@@ -226,31 +343,63 @@ export async function returnBorrowedBookFromUser(UserName){
 // DELETE
 // -- users
 export async function deleteUser(UserName) {
-    await pool.query('DELETE FROM FavoriteBooks WHERE Name = ?', [UserName]);
-    await pool.query('DELETE FROM BorrowedBooks WHERE Name = ?', [UserName]);
-    await pool.query('DELETE FROM SubscribedUsers WHERE Name = ?', [UserName]);
+    await deleteSubscribedUser(UserName);
     await pool.query('DELETE FROM Users WHERE Name = ?', [UserName]);
-
-    return true;
 }
 
 export async function deleteSubscribedUser(UserName){
-    // delete the subscription and the borrowed books, keep the favorites
+    await pool.query('DELETE FROM FavoriteBooks WHERE Name = ?', [UserName]);
+    await pool.query('DELETE FROM BorrowedBooks WHERE Name = ?', [UserName]);
+    await pool.query('DELETE FROM SubscribedUsers WHERE Name = ?', [UserName]);
 }
 
 // -- books
-export async function deleteBook(BookID, [Title, Author, Summary, ImagePath]){
+export async function deleteBook(BookID){
     // delete the book, it's copies - but first - make sure the book is not already borrowed. 
     // if all its copies are not borrowed - it can be removed, including remobing all the copies and all the borrow history it ever had.
+    const [borrowed_copies_count] = await pool.query(`
+        SELECT 
+            COUNT(*) AS count 
+        FROM 
+            BorrowedBooks 
+        INNER JOIN 
+            BookCopies ON BorrowedBooks.CopyID = BookCopies.CopyID 
+        WHERE 
+            BookCopies.BookID = ? AND BorrowedBooks.ReturnDate IS NULL`,
+        [BookID]
+    );
+    if(borrowed_copies_count[0].count > 0) return false;
+
+    await pool.query('DELETE FROM BorrowedBooks WHERE CopyID IN (SELECT CopyID FROM BookCopies WHERE BookID = ?)', [BookID]);
+    await pool.query('DELETE FROM BookCopies WHERE BookID = ?', [BookID]);
+    await pool.query('DELETE FROM Books WHERE BookID = ?', [BookID]);
+    
+    return true;
 }
 
-export async function deleteCopyOfBook(BookID){
-    // delete the copy only if the copy is not borrowed - remove all borrow information if this copy
+export async function deleteCopyOfBook(CopyID){
+    // Check if the copy is currently borrowed
+    const [borrowedRows] = await pool.query(`
+        SELECT 
+            COUNT(*) AS isBorrowed
+        FROM 
+            BorrowedBooks 
+        WHERE CopyID = ? AND ReturnDate IS NULL`,
+        [CopyID]);
+
+    if (borrowedRows[0].isBorrowed > 0) return false;
+
+    await pool.query('DELETE FROM BorrowedBooks WHERE CopyID = ?', [CopyID]);
+    await pool.query('DELETE FROM BookCopies WHERE CopyID = ?', [CopyID]);
+    return true;
 }
 
 // -- books and users
-export async function deleteFavoriteBookFromUser(UserName){
-
+export async function deleteFavoriteBookFromUser(UserName, BookID){
+    await pool.query(
+        'DELETE FROM FavoriteBooks WHERE Name = ? AND BookID = ?',
+        [UserName, BookID]
+    );
 }
 
 // -- quotes
@@ -278,10 +427,6 @@ async function isUserExist(UserName){
 
 
 
-await deleteQuote(12);
-let books = await getAllQuotes();
-console.log(books);
 
 
-books = await getAllImages();
-console.log(books);
+
