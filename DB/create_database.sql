@@ -4,19 +4,19 @@ USE LibraryDB;
 
 -- Table for all users
 CREATE TABLE Users (
-    UserID INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
+    Name VARCHAR(100) PRIMARY KEY,
     Password VARCHAR(255) NOT NULL
 );
 
 -- Table for subscribed users' additional information
 CREATE TABLE SubscribedUsers (
-    SubscribedUserID INT PRIMARY KEY,
+    Name VARCHAR(100),
     Phone VARCHAR(15) NOT NULL,
     Address VARCHAR(255),
     Email VARCHAR(100) NOT NULL,
     SubscriptionExpiration DATE NOT NULL,
-    FOREIGN KEY (SubscribedUserID) REFERENCES Users(UserID)
+    PRIMARY KEY (Name),
+    FOREIGN KEY (Name) REFERENCES Users(Name)
 );
 
 -- Table for books
@@ -37,21 +37,21 @@ CREATE TABLE BookCopies (
 
 -- Table to manage borrowed books by subscribed users
 CREATE TABLE BorrowedBooks (
-	BorrowID INT AUTO_INCREMENT PRIMARY KEY,
-    UserID INT,
+    BorrowID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100),
     CopyID INT,
     BorrowDate DATE NOT NULL,
     ReturnDate DATE,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    FOREIGN KEY (Name) REFERENCES Users(Name),
     FOREIGN KEY (CopyID) REFERENCES BookCopies(CopyID)
 );
 
 -- Table to manage favorite books by subscribed users
 CREATE TABLE FavoriteBooks (
-    UserID INT,
+    Name VARCHAR(100),
     BookID INT,
-    PRIMARY KEY (UserID, BookID),
-    FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    PRIMARY KEY (Name, BookID),
+    FOREIGN KEY (Name) REFERENCES Users(Name),
     FOREIGN KEY (BookID) REFERENCES Books(BookID)
 );
 
@@ -59,7 +59,6 @@ CREATE TABLE FavoriteBooks (
 CREATE TABLE Quotes (
     QuoteID INT AUTO_INCREMENT PRIMARY KEY,
     Quote TEXT NOT NULL
-    
 );
 
 -- Table for library images
