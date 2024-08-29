@@ -82,8 +82,3 @@ VALUES
 ('Call me Ishmael.'),
 ('A journey of a thousand miles begins with a single step.'),
 ('To infinity and beyond!');
-
--- Inserting data into LibraryImages table
-INSERT INTO LibraryImages (ImagePath)
-VALUES
-(NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL);
