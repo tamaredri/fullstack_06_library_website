@@ -1,16 +1,17 @@
+
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
-const Login = ({ onLogin }) => {
+const Signup = ({ onLogin }) => {
  
  
   return (
     <div >
-      login
+      signup
 
     </div>
   );
 };
 
-export default Login;
+export default Signup;
 
