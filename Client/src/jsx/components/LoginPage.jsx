@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react'
 
 
 function LoginPage(){
-    //const navigate = useNavigate();
+    const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState("");
     const userName = useRef("");
     const password = useRef("");
@@ -26,9 +26,9 @@ function LoginPage(){
             return res.json();
         })
         .then(user => {
-            if (user.password === password.current.value) {
+            if (user.Password === password.current.value) {
                 localStorage.setItem('currentUser', user.Name);
-                // navigate('/HomePage');
+                navigate(`/user/${user.Name}`);
             } else {
                 setErrorMessage("WRONG PASSWORD");
             }

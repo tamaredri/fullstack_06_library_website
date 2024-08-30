@@ -2,6 +2,7 @@ import * as db from '../DB/database.js';
 import * as validate from './validation.js'
 import express from 'express';
 import cors from 'cors';
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -111,7 +112,7 @@ app.get('/library/images', async(req, res) => {
 // -- users
 app.post('/library/users', async(req, res) => {
     // 1.
-    const userName = req.body.UserName;
+    const userName = req.body.Name;
     const user = await db.getUserByName(userName);
     if (user){
         res.status(400).send("The user already exist");

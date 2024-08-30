@@ -5,7 +5,7 @@ import style from './../../css/SignupPage.module.css'
 
 function SignupPage(){
 
-    //const navigate = useNavigate();
+    const navigate = useNavigate();
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -25,27 +25,12 @@ function SignupPage(){
         e.preventDefault();
 
         if(password !== authPassword.current.value) return;
-    
-        fetch(`http://localhost:3000/library/users/${userName}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(async (response) => {
-            if (response.ok) { //user already exist
-                setErrorMessage("THIS USER NAME ALREADY EXISTS");
-                return;
-            }
-            register();
-        })
-    }
-
-    function register() {
+       
         const user = {
             "Name": userName,
             "Password": password,
         };
+        console.log(userName);
     
         fetch(`http://localhost:3000/library/users`, {
                 method: 'POST',
@@ -65,14 +50,13 @@ function SignupPage(){
             setTimeout(() => {
                 setLoad(false);
                 localStorage.setItem('currentUser', user.Name);
-                // navigate('/HomePage');
+                navigate(`/user/${user.Name}`);
             }, 3000);
         })
         .catch((error) => {
             setErrorMessage(error.message.toUpperCase());
         });
     }
-
         
     return <>
         <form className={style.register_form} onSubmit={signup}>
