@@ -6,7 +6,7 @@ app.use(express.json());
 
 // GET
 app.get('/', async(req, res) => {
-    
+    res.send('data');
 });
 
 // -- users
