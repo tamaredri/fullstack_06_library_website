@@ -66,6 +66,20 @@ export async function getBookCopiesByID(BookID){
     return rows;
 }
 
+export async function getSingleBookCopyByID(CopyID){
+    const [rows] = await pool.query(`
+        SELECT 
+            bc.CopyID,
+            IF(bb.BorrowDate IS NOT NULL AND bb.ReturnDate IS NULL, 'Borrowed', 'Available') AS Status
+        FROM 
+            BookCopies bc
+        LEFT JOIN 
+            BorrowedBooks bb ON bc.CopyID = bb.CopyID
+        WHERE bc.CopyID = ?;`, 
+        [CopyID]);
+    return rows[0];
+}
+
 // -- books and users
 export async function getUsersFavoriteBooks(Name){
     const [rows] = await pool.query(`
@@ -299,43 +313,15 @@ export async function deleteSubscribedUser(UserName){
 
 // -- books
 export async function deleteBook(BookID){
-    // delete the book, it's copies - but first - make sure the book is not already borrowed. 
-    // if all its copies are not borrowed - it can be removed, including remobing all the copies and all the borrow history it ever had.
-    const [borrowed_copies_count] = await pool.query(`
-        SELECT 
-            COUNT(*) AS count 
-        FROM 
-            BorrowedBooks 
-        INNER JOIN 
-            BookCopies ON BorrowedBooks.CopyID = BookCopies.CopyID 
-        WHERE 
-            BookCopies.BookID = ? AND BorrowedBooks.ReturnDate IS NULL`,
-        [BookID]
-    );
-    if(borrowed_copies_count[0].count > 0) return false;
-
+    await pool.query('DELETE FROM FavoriteBooks WHERE BookID = ?', [BookID]);
     await pool.query('DELETE FROM BorrowedBooks WHERE CopyID IN (SELECT CopyID FROM BookCopies WHERE BookID = ?)', [BookID]);
     await pool.query('DELETE FROM BookCopies WHERE BookID = ?', [BookID]);
     await pool.query('DELETE FROM Books WHERE BookID = ?', [BookID]);
-    
-    return true;
 }
 
 export async function deleteCopyOfBook(CopyID){
-    // Check if the copy is currently borrowed
-    const [borrowedRows] = await pool.query(`
-        SELECT 
-            COUNT(*) AS isBorrowed
-        FROM 
-            BorrowedBooks 
-        WHERE CopyID = ? AND ReturnDate IS NULL`,
-        [CopyID]);
-
-    if (borrowedRows[0].isBorrowed > 0) return false;
-
     await pool.query('DELETE FROM BorrowedBooks WHERE CopyID = ?', [CopyID]);
     await pool.query('DELETE FROM BookCopies WHERE CopyID = ?', [CopyID]);
-    return true;
 }
 
 // -- books and users
@@ -361,16 +347,3 @@ export async function deleteImage(ImageID){
         WHERE ImageID  = (?);
         `, [ImageID]);
 }
-
-
-// general functions
-async function isUserExist(UserName){
-    const [rows] = await getUserByName(UserName);
-    return rows != undefined; // change return value - marks the user doesn't exists
-}
-
-
-
-
-
-

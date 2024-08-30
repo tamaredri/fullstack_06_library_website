@@ -6,7 +6,7 @@ app.use(express.json());
 
 // GET
 app.get('/', async(req, res) => {
-    res.send('data');
+    res.send('data'); // send the images and the quotes
 });
 
 // -- users
@@ -323,17 +323,21 @@ app.delete('/library/books/:bookid', async(req, res) => {
     const book = await db.getBookById(bookid);
     if(!book) res.status(404).send("The book doesnt exist");
 
-    //לבדוק שהספר לא מושאל
+    const bookCopies = await db.getBookCopiesByID(bookid);
+    let bookCopy = bookCopies.find(c => c.Status === "Borrowed");
+    if(bookCopy) res.status(400).send("There is a copy of the book that is currently borrowed");
 
     await db.deleteBook(bookid);
     res.send(book);
 });
 
-app.delete('/library/bookCopies/:bookid', async(req, res) => {
-        //לבדוק שהספר לא מושאל
-    const copyBookid = req.params.bookid;
-    const copyBook = await db.getBooksById(copyBookid);
+app.delete('/library/bookCopies/:copyid', async(req, res) => {
+    const copyBookid = req.params.copyid;
+    const copyBook = await db.getSingleBookCopyByID(copyBookid);
     if(!copyBook) res.status(404).send("The copy book doesnt exist");
+
+    if(copyBook.Status === "Borrowed")
+        res.status(400).send("Theis copy of the book is currently borrowed");
 
     await db.deleteCopyOfBook(copyBookid);
     res.send(copyBook);
@@ -341,15 +345,16 @@ app.delete('/library/bookCopies/:bookid', async(req, res) => {
 
 app.delete('/library/favoriteBooks/:userName', async(req, res) => {
     const userName = req.params.userName;
-    const user = db.getUserByName(userName);
+    const user = await db.getUserByName(userName);
     if(!user) res.status(404).send("The copy user doesnt exist");
 
-    await db.deleteCopyOfBook(copyBookid);
-    res.send(copyBook);
-});
+    const bookid = req.body.BookID;
+    const favoriteBooks = await db.getUsersFavoriteBooks(userName);
+    const favoriteBook = favoriteBooks.fond(b => parseInt(b.BookID) === parseIntbookid);
+    if(!favoriteBook) res.status(404).send("The book is not in the user's favorite list");
 
-app.delete('/library/borrowedBooks/:userid/:bookid', (req, res) => {
-    
+    await db.deleteFavoriteBookFromUser(userName, bookid);
+    res.send(favoriteBook);
 });
 
 
