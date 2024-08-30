@@ -12,12 +12,12 @@ const pool = mysql.createPool({
 
 // GET functions
 // -- users
-export async function getUserByName(UserName){
-    const [rows] = await pool.query("SELECT * from users where Name=?;", [UserName]);
-    return rows;
+export async function getUserByName(Name){
+    const [rows] = await pool.query("SELECT * from users where Name=?;", [Name]);
+    return rows[0];
 }
 
-export async function getSubscribedUserByName(UserName){
+export async function getSubscribedUserByName(Name){
     const [rows] = await pool.query(`
         SELECT 
             u.Name,
@@ -28,12 +28,12 @@ export async function getSubscribedUserByName(UserName){
             su.SubscriptionExpiration
         FROM 
             Users u
-        LEFT JOIN 
+        INNER JOIN 
             SubscribedUsers su ON u.Name = su.Name
         WHERE 
             u.Name = ?;
-`, [UserName]);
-    return rows;
+`, [Name]);
+    return rows[0];
 }
     
 // -- books
@@ -42,9 +42,14 @@ export async function getBooks(){
     return rows;
 }
 
-export async function getBooksById(id){
+export async function getBookById(id){
     const [rows] = await pool.query("SELECT * from books WHERE BookID=?;", [id]);
-    return rows;
+    return rows[0];
+}
+
+export async function getBookByTitle(title){
+    const [rows] = await pool.query("SELECT * from books WHERE Title=?;", [title]);
+    return rows[0];
 }
 
 export async function getBookCopiesByID(BookID){
@@ -62,7 +67,7 @@ export async function getBookCopiesByID(BookID){
 }
 
 // -- books and users
-export async function getUsersFavoriteBooks(UserName){
+export async function getUsersFavoriteBooks(Name){
     const [rows] = await pool.query(`
         SELECT 
             b.BookID, 
@@ -74,11 +79,11 @@ export async function getUsersFavoriteBooks(UserName){
         JOIN 
             Books b ON b.BookID = fb.BookID 
         WHERE 
-            fb.Name = ?;`, [UserName]);
+            fb.Name = ?;`, [Name]);
     return rows;
 }
 
-export async function getUsersBorrowedBooks(UserName){
+export async function getUsersBorrowedBooks(Name){
     const [rows] = await pool.query(`
         SELECT 
             b.BookID,
@@ -95,7 +100,7 @@ export async function getUsersBorrowedBooks(UserName){
             Books b ON bc.BookID = b.BookID
         WHERE 
             bb.Name = ? 
-            AND bb.ReturnDate IS NULL;`, [UserName]);
+            AND bb.ReturnDate IS NULL;`, [Name]);
     return rows;
 }
 
@@ -134,93 +139,47 @@ export async function getAllImages(){
 
 // POST
 // -- users
-export async function registerNewUser(UserName, password){
-    if(await isUserExist(UserName))
-        return false;
-
+export async function registerNewUser({Name, Password}){
     await pool.query(
         'INSERT INTO Users (Name, Password) VALUES (?, ?)', 
-        [UserName, password]);
-    return true;
+        [Name, Password]);
+    return {Name, Password};
 }
 
-export async function subscribeNewUser(UserName, Phone, Address, Email, SubscriptionLength){
-    if(!await isUserExist(UserName))
-        return false;
-
+export async function subscribeNewUser({Name, Phone, Address, Email, SubscriptionExpiration}){
     await pool.query(
-        'INSERT INTO SubscribedUsers (Name, Phone, Address, Email, SubscriptionExpiration) VALUES (?, ?, ?, ?, DATE_ADD(CURDATE(), INTERVAL ? MONTH))',
-        [UserName, Phone, Address, Email, SubscriptionLength]);
-    return true;
+        'INSERT INTO SubscribedUsers (Name, Phone, Address, Email, SubscriptionExpiration) VALUES (?, ?, ?, ?, ?)',
+        [Name, Phone, Address, Email, new Date(SubscriptionExpiration)]);
 }
 
 // -- books
 export async function addNewBook({Title, Author, Summary, ImagePath}){
-    // Enforce unique book title.
-    const [rows] = await pool.query("SELECT * from Books as b WHERE b.Title = ?;", [Title]);
-    if(rows.length > 0) return false;
-
-    await pool.query('INSERT INTO Books (Title, Author, Summary, ImagePath) VALUES (?, ?, ?, ?)', [Title, Author,  Summary || null, ImagePath || null]);
-    return true;
+    const [result] = await pool.query('INSERT INTO Books (Title, Author, Summary, ImagePath) VALUES (?, ?, ?, ?)', [Title, Author,  Summary || null, ImagePath || null]);
+    return result.insertId;
 }
 
 export async function addNewCopyOfBook(BookID){
-    const book = await getBooksById(BookID);
-    if(book.length == 0) return false;
-
-    await pool.query(`INSERT INTO BookCopies (BookID) VALUES (?);`, [BookID]);
-    return true;
+    const [result] = await pool.query(`INSERT INTO BookCopies (BookID) VALUES (?);`, [BookID]);
+    return result.insertId;
 }
 
 // -- books and users
 export async function addFavoriteBookToUser(UserName, BookID){
-    const user = await getUserByName(UserName)
-    if(user.length === 0) return false; // user doesnt exist
-    const book = await getBooksById(BookID)
-    if(book.length === 0) return false; // book doesnt exist
-
-    const [rows] = await pool.query(
-        `SELECT 
-            COUNT(*) AS count 
-        FROM 
-            FavoriteBooks 
-        WHERE Name = ? AND BookID = ?`,
-        [UserName, BookID]);
-
-    if (rows[0].count === 0){ // the book is not in favorite
-        await pool.query(
-            'INSERT INTO FavoriteBooks (Name, BookID) VALUES (?, ?);',
-            [UserName, BookID]
-        );
-    }
-return true;
+    await pool.query(
+        'INSERT INTO FavoriteBooks (Name, BookID) VALUES (?, ?);',
+        [UserName, BookID]
+    );
+    return { Name: UserName, BookID};
 }
 
-export async function addBorrowedBookToUser(UserName, CopyID){
-    const user = await getUserByName(UserName)
-    if(user.length === 0) return false; // user doesnt exist
-    // check if the copy exists at all
-    // const book = await getBookCopiesByID(CopyID)
-    // console.log(book);
-    // if(book.length === 0) return false; // copy doesnt exist
-
-    // Check if the copy is already borrowed
-    const [rows] = await pool.query(`
-    SELECT 
-        COUNT(*) AS count 
-    FROM 
-        BorrowedBooks 
-    WHERE CopyID = ? AND ReturnDate IS NULL`,
-    [CopyID]);
-
-    if (rows[0].count > 0) return false;
+export async function addBorrowedBookToUser({ Name, CopyID }){
 
     // Insert the borrow record
     await pool.query(
         'INSERT INTO BorrowedBooks (Name, CopyID, BorrowDate) VALUES (?, ?, CURDATE())',
-        [UserName, CopyID]
+        [Name, CopyID]
     );
-    return true;
+    return { Name, CopyID };
 }
 
 // -- quotes
@@ -239,26 +198,24 @@ export async function addNewImage(newImagePath){
 }
 
 
-// UPDATE
+// PUT
 // -- users
-export async function updateUser(UserName, newPassword) {
-    if(!await isUserExist(UserName))
-        return false;
+export async function updateUser({Name, Password}) {
     
     await pool.query(
         'UPDATE Users SET Password = ? WHERE Name = ?',
-        [newPassword, UserName]
+        [Password, Name]
     );
-    return true;
+    return {Name, Password};
 }
 
 
-export async function updateSubscribedUser(UserName, {Phone, Address, Email, SubscriptionLength}){
+export async function updateSubscribedUser({Name, Phone, Address, Email, SubscriptionExpiration}){
     let query = 'UPDATE SubscribedUsers SET ';
     const params_list = [];
 
     if (Phone !== undefined) {
-        query += 'Phone = ?, ';
+        query += 'Phone = ?, '; 
         params_list.push(Phone);
     }
     if (Address !== undefined) {
@@ -269,29 +226,22 @@ export async function updateSubscribedUser(UserName, {Phone, Address, Email, Sub
         query += 'Email = ?, ';
         params_list.push(Email);
     }
-    if (SubscriptionLength !== undefined) {
-        query += 'SubscriptionExpiration = DATE_ADD(CURDATE(), INTERVAL ? MONTH), ';
-        params_list.push(SubscriptionLength);
+    if (SubscriptionExpiration !== undefined) {
+        query += 'SubscriptionExpiration = ?, ';
+        params_list.push(new Date(SubscriptionExpiration));
     }
-    console.log(query);
-    console.log(params_list);
 
     if (params_list.length > 0){
         query = query.slice(0, -2) + ' WHERE Name = ?';
-        params_list.push(UserName);
+        params_list.push(Name);
     
-        console.log(query);
-        console.log(params_list);
-        // Execute the query
         await pool.query(query, params_list);
     } 
+    return {Name, Phone, Address, Email, SubscriptionExpiration};
 }
 
 // -- books
-export async function updateBook(BookID, {Title, Author, Summary, ImagePath}){
-    const book = await getBooksById(BookID);
-    if(book.length == 0) return 0;
-
+export async function updateBook({BookID, Title, Author, Summary, ImagePath}){
     let query = 'UPDATE Books SET ';
     const params_list = [];
 
@@ -312,28 +262,22 @@ export async function updateBook(BookID, {Title, Author, Summary, ImagePath}){
         query += 'ImagePath = ?, ';
         params_list.push(ImagePath);
     }
-
+ 
     query = query.slice(0, -2) + ' WHERE BookID = ?';
     params_list.push(BookID);
     
     await pool.query(query, params_list);
-    return true;
+    console.log(query);
+    console.log(params_list);
+    return {BookID, Title, Author, Summary, ImagePath};
 }
 
 
 // -- books and users
-export async function returnBorrowedBookFromUser(UserName, CopyID){
-    // Check if the borrow record exists and belongs to the specified user
-    const [rows] = await pool.query(
-        'SELECT * FROM BorrowedBooks WHERE CopyID = ? AND Name = ? AND ReturnDate IS NULL',
-        [CopyID, UserName]
-    );
-    if (rows.length === 0) return false;
-
-    // Update the ReturnDate to the current date
+export async function returnBorrowedBookFromUser(borrowID){
     await pool.query(
-        'UPDATE BorrowedBooks SET ReturnDate = CURDATE() WHERE CopyID = ?',
-        [CopyID]
+        'UPDATE BorrowedBooks SET ReturnDate = CURDATE() WHERE BorrowID = ?',
+        [borrowID]
     );
 
 }
