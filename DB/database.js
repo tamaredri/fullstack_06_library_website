@@ -288,11 +288,11 @@ export async function returnBorrowedBookFromUser(borrowID){
 // -- users
 export async function deleteUser(UserName) {
     await deleteSubscribedUser(UserName);
+    await pool.query('DELETE FROM FavoriteBooks WHERE Name = ?', [UserName]);
     await pool.query('DELETE FROM Users WHERE Name = ?', [UserName]);
 }
 
 export async function deleteSubscribedUser(UserName){
-    await pool.query('DELETE FROM FavoriteBooks WHERE Name = ?', [UserName]);
     await pool.query('DELETE FROM BorrowedBooks WHERE Name = ?', [UserName]);
     await pool.query('DELETE FROM SubscribedUsers WHERE Name = ?', [UserName]);
 }

@@ -57,14 +57,22 @@ app.get('/library/favoriteBooks/:userName', async(req, res) => {
 
 app.get('/library/borrowedBooks/:userName', async(req, res) => {
     const userName = req.params.userName;
+    const subscribedUser = await db.getSubscribedUserByName(userName);
+    if(!subscribedUser)
+        res.status(404).send("The user is not subscribed");
+
     const borrowesBooks = await db.getUsersBorrowedBooks(userName);
     res.send(borrowesBooks);
 });
 
 app.get('/library/borrowedBooksHistory/:userName', async(req, res) => {
     const userName = req.params.userName;
+    const subscribedUser = await db.getSubscribedUserByName(userName);
+    if(!subscribedUser)
+        res.status(404).send("The user is not subscribed");
+
     const borrowesBooks = await db.getUsersBorrowHistory(userName);
-    res.send(borrowesBooks);
+    res.send(borrowesBooks); 
 });
 
 // -- quotes
@@ -288,8 +296,11 @@ app.put('/library/borrowedBooks/:userName', async(req, res) => {
 
 app.delete('/library/users/:userName', async(req, res) => {
     const userName = req.params.userName;
-    const user = db.getUserByName(userName);
+    const user = await db.getUserByName(userName);
     if(!user) res.status(404).send("The user doesnt exist");
+
+    const borrowBooks = await db.getUsersBorrowedBooks(userName);
+    if(borrowBooks.length > 0) res.status(400).send("The user still has books");
 
     await db.deleteUser(userName);
     res.send(user);
@@ -297,8 +308,11 @@ app.delete('/library/users/:userName', async(req, res) => {
 
 app.delete('/library/subscribedUsers/:userName', async(req, res) => {
     const subscribedUserName = req.params.userName;
-    const subscribedUser = db.getSubscribedUserByName(subscribedUserName);
+    const subscribedUser = await db.getSubscribedUserByName(subscribedUserName);
     if(!subscribedUser) res.status(404).send("The subscribed user doesnt exist");
+
+    const borrowBooks = await db.getUsersBorrowedBooks(userName);
+    if(borrowBooks.length > 0) res.status(400).send("The user still has books");
 
     await db.deleteSubscribedUser(subscribedUserName);
     res.send(subscribedUser);
@@ -306,16 +320,19 @@ app.delete('/library/subscribedUsers/:userName', async(req, res) => {
 
 app.delete('/library/books/:bookid', async(req, res) => {
     const bookid = req.params.bookid;
-    const book = db.getBooksById(bookid);
+    const book = await db.getBookById(bookid);
     if(!book) res.status(404).send("The book doesnt exist");
+
+    //לבדוק שהספר לא מושאל
 
     await db.deleteBook(bookid);
     res.send(book);
 });
 
 app.delete('/library/bookCopies/:bookid', async(req, res) => {
+        //לבדוק שהספר לא מושאל
     const copyBookid = req.params.bookid;
-    const copyBook = db.getBooksById(copyBookid);
+    const copyBook = await db.getBooksById(copyBookid);
     if(!copyBook) res.status(404).send("The copy book doesnt exist");
 
     await db.deleteCopyOfBook(copyBookid);
@@ -325,7 +342,7 @@ app.delete('/library/bookCopies/:bookid', async(req, res) => {
 app.delete('/library/favoriteBooks/:userName', async(req, res) => {
     const userName = req.params.userName;
     const user = db.getUserByName(userName);
-    if(!copyBook) res.status(404).send("The copy book doesnt exist");
+    if(!user) res.status(404).send("The copy user doesnt exist");
 
     await db.deleteCopyOfBook(copyBookid);
     res.send(copyBook);
