@@ -42,7 +42,7 @@ app.get('/library/books/:bookid', async(req, res) => {
     res.send(book);
 });
 
-app.get('/library/booksCopies/:bookid', async(req, res) => {
+app.get('/library/bookCopies/:bookid', async(req, res) => {
     const bookid = req.params.bookid;
     const book = await db.getBookById(bookid);
     if(!book)
@@ -157,7 +157,7 @@ app.post('/library/books', async(req, res) => {
     res.status(201).send(newBook);
 });
 
-app.post('/library/booksCopies', async(req, res) => {
+app.post('/library/bookCopies', async(req, res) => {
     const bookid = req.body.BookID;
     const book = await db.getBookById(bookid);
     if (!book) res.status(404).send("The book doesn't exist");
@@ -342,21 +342,24 @@ app.delete('/library/bookCopies/:copyid', async(req, res) => {
     const copyBook = await db.getSingleBookCopyByID(copyBookid);
     if(!copyBook) {res.status(404).send("The copy book doesnt exist"); return;};
 
-    if(copyBook.Status === "Borrowed"){res.status(400).send("Theis copy of the book is currently borrowed"); return;}
+    if(copyBook.Status === "Borrowed") {res.status(400).send("Theis copy of the book is currently borrowed"); return;}
 
     await db.deleteCopyOfBook(copyBookid);
     res.send(copyBook);
 });
 
-app.delete('/library/favoriteBooks/:userName', async(req, res) => {
+app.delete('/library/favoriteBooks/:userName', async(req, res) => { 
     const userName = req.params.userName;
     const user = await db.getUserByName(userName);
-    if(!user) res.status(404).send("The copy user doesnt exist");
+    if(!user) {
+        res.status(404).send("The user doesnt exist"); 
+        return;
+    }
 
     const bookid = req.body.BookID;
     const favoriteBooks = await db.getUsersFavoriteBooks(userName);
-    const favoriteBook = favoriteBooks.fond(b => parseInt(b.BookID) === parseIntbookid);
-    if(!favoriteBook) res.status(404).send("The book is not in the user's favorite list");
+    const favoriteBook = favoriteBooks.find(b => parseInt(b.BookID) === parseInt(bookid));
+    if(!favoriteBook) {res.status(404).send("The book is not in the user's favorite list"); return;};
 
     await db.deleteFavoriteBookFromUser(userName, bookid);
     res.send(favoriteBook);
