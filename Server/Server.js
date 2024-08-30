@@ -13,16 +13,20 @@ app.get('/', async(req, res) => {
 app.get('/library/users/:userName', async(req, res) => {
     const userName = req.params.userName;
     const user = await db.getUserByName(userName);
-    if(!user)
+    if(!user){
         res.status(404).send("The user doesn't exist");
+        return;
+    }
     res.send(user);
 });
 
 app.get('/library/subscribedUsers/:userName', async(req, res) => {
     const userName = req.params.userName;
     const subscribedUser = await db.getSubscribedUserByName(userName);
-    if(!subscribedUser)
+    if(!subscribedUser){
         res.status(404).send("The user is not subscribed");
+        return;
+    }
     
     res.send(subscribedUser);
 });
@@ -37,8 +41,10 @@ app.get('/library/books', async(req, res) => {
 app.get('/library/books/:bookid', async(req, res) => {
     const bookid = req.params.bookid;
     const book = await db.getBookById(bookid);
-    if(!book)
+    if(!book){
         res.status(404).send("The book doesn't exist");
+        return;
+    }
     res.send(book);
 });
 
@@ -58,8 +64,10 @@ app.get('/library/favoriteBooks/:userName', async(req, res) => {
 app.get('/library/borrowedBooks/:userName', async(req, res) => {
     const userName = req.params.userName;
     const subscribedUser = await db.getSubscribedUserByName(userName);
-    if(!subscribedUser)
+    if(!subscribedUser){
         res.status(404).send("The user is not subscribed");
+        return;
+    }
 
     const borrowesBooks = await db.getUsersBorrowedBooks(userName);
     res.send(borrowesBooks);
