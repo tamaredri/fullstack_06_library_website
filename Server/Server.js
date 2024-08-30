@@ -23,8 +23,7 @@ app.get('/library/subscribedUsers/:userName', async(req, res) => {
     const subscribedUser = await db.getSubscribedUserByName(userName);
     if(!subscribedUser)
         res.status(404).send("The user is not subscribed");
-
-    //if(subscribedUser.??? < now) res.status(400).send("The user is not subscribed");
+    
     res.send(subscribedUser);
 });
 
@@ -43,23 +42,37 @@ app.get('/library/books/:bookid', async(req, res) => {
     res.send(book);
 });
 
-app.get('/library/bookCopies/:bookid', async(req, res) => {
+app.get('/library/booksCopies/:bookid', async(req, res) => {
     const bookid = req.params.bookid;
-    const bookCopies = await db.getBookCopies(bookid);
+    const bookCopies = await db.getBookCopiesByID(bookid);
     res.send(bookCopies);
 });
 
 // -- books and users
 app.get('/library/favoriteBooks/:userName', async(req, res) => {
     const userName = req.params.userName;
-    const favoriteBooks = await db.getFavoriteBooks(userName);
+    const favoriteBooks = await db.getUsersFavoriteBooks(userName);
     res.send(favoriteBooks);
 });
 
 app.get('/library/borrowedBooks/:userName', async(req, res) => {
     const userName = req.params.userName;
-    const borrowesBooks = await db.getBorrowedBooks(userName);
+    const subscribedUser = await db.getSubscribedUserByName(userName);
+    if(!subscribedUser)
+        res.status(404).send("The user is not subscribed");
+
+    const borrowesBooks = await db.getUsersBorrowedBooks(userName);
     res.send(borrowesBooks);
+});
+
+app.get('/library/borrowedBooksHistory/:userName', async(req, res) => {
+    const userName = req.params.userName;
+    const subscribedUser = await db.getSubscribedUserByName(userName);
+    if(!subscribedUser)
+        res.status(404).send("The user is not subscribed");
+
+    const borrowesBooks = await db.getUsersBorrowHistory(userName);
+    res.send(borrowesBooks); 
 });
 
 // -- quotes
@@ -79,8 +92,8 @@ app.get('/library/images', async(req, res) => {
 // -- users
 app.post('/library/users', async(req, res) => {
     // 1.
-    const userName = req.body.userName;
-    const user = getUserByName(userName);
+    const userName = req.body.UserName;
+    const user = await db.getUserByName(userName);
     if (user) res.status(400).send("The user already exist");
 
     // 2.
@@ -91,17 +104,17 @@ app.post('/library/users', async(req, res) => {
     }
     
     // 3.
-    await db.registerNewUser(req.body);
-    res.send(req.body);
+    const newUser = await db.registerNewUser(req.body);
+    res.status(201).send(newUser);
 })
 
 app.post('/library/subscribedUsers', async(req, res) => {
-    // 1.UserName, Phone, Address, Email, subscriptionLength
-    const userName = req.body.userName;
-    const user = getUserByName(userName);
+    // 1.
+    const userName = req.body.Name;
+    const user = await db.getUserByName(userName);
     if (!user) res.status(400).send("The user must be register");
 
-    const subscribedUser = getSubscribedUserByName(userName);
+    const subscribedUser = await db.getSubscribedUserByName(userName);
     if(subscribedUser) res.status(400).send("The user already subscribed");
 
     // 2.
@@ -110,76 +123,106 @@ app.post('/library/subscribedUsers', async(req, res) => {
         res.status(400).send(result.error.details[0].message);
         return;
     }
-    
+
     // 3.
     await db.subscribeNewUser(req.body);
-    res.send(req.body);
+    const newSubscribedUser = await db.getSubscribedUserByName(userName);
+    res.status(201).send(newSubscribedUser);
 });
 
 
 // -- books
 
 app.post('/library/books', async(req, res) => {
-    // האם ספר צריך להיות ייחודי????
-    // 1. Title, Author, Summary, ImagePath
-    const book = req.body.userName;
-    const user = getUserByName(userName);
-    if (user) res.status(400).send("The user already exist");
+    const bookTitle = req.body.Title;
+    const book = await db.getBookByTitle(bookTitle);
+    if (book) res.status(400).send("The book already exist");
 
     // 2.
-    const result = validate.validateUser(req.body);
+    const result = validate.validateBook(req.body);
     if(result.error){
         res.status(400).send(result.error.details[0].message);
         return;
     }
     
     // 3.
-    await db.registerNewUser(req.body);
-    res.send(req.body);
+    const bookid = await db.addNewBook(req.body);
+    const newBook = await db.getBookById(bookid);
+    res.status(201).send(newBook);
 });
 
-app.post('/library/copyBooks', (req, res) => {
+app.post('/library/booksCopies', async(req, res) => {
+    const bookid = req.body.BookID;
+    const book = await db.getBookById(bookid);
+    if (!book) res.status(404).send("The book doesn't exist");
     
-});
+    const copyid = await db.addNewCopyOfBook(bookid);
+    res.status(201).send({BookID: bookid, CopyID: copyid}); 
+}); 
 
 // -- books and users
 
-app.post('/library/favoriteBooks', (req, res) => {
-    
+app.post('/library/favoriteBooks/:userName', async(req, res) => {
+    const userName = req.params.userName;
+    const user = await db.getUserByName(userName);
+    if(!user) res.status(404).send("The user doesn't exist");
+
+    const bookid = req.body.BookID;
+    const book = await db.getBookById(bookid);
+    if(!book) res.status(404).send("The book doesn't exist");
+
+    const favoriteBooks = await db.getUsersFavoriteBooks(userName);
+    let favoriteBook = favoriteBooks.find(b => parseInt(b.BookID) === parseInt(bookid));
+    if(favoriteBook)
+        res.status(200).send(favoriteBook); 
+
+    favoriteBook = await db.addFavoriteBookToUser(userName, bookid);
+    res.status(201).send(favoriteBook);    
 });
 
-app.post('/library/borrowedBooks', (req, res) => {
-    
+app.post('/library/borrowedBooks/:userName', async(req, res) => {
+
+    const userName = req.params.userName;
+    const user = await db.getUserByName(userName);
+    if(!user) res.status(404).send("The user doesn't exist");
+
+    const bookid = req.body.BookID;
+    const book = await db.getBookById(bookid);
+    if(!book) res.status(404).send("The book doesn't exist");
+
+    const bookCopies = await db.getBookCopiesByID(bookid);
+    let bookCopy = bookCopies.find(c => c.Status === "Available");
+    if(!bookCopy) res.status(404).send("No copies are available");
+
+    const borrowedBook = await db.addBorrowedBookToUser({Name:userName, CopyID: bookCopy.CopyID});
+    res.status(201).send(borrowedBook); 
+     
 });
 
 // -- quotes
 app.post('/library/quotes', async(req, res) => {
-    // 1.
     const result = validate.validateQuote(req.body);
     if(result.error){
         res.status(400).send(result.error.details[0].message);
         return;
     }
     
-    // 2.
     await db.addNewQuote(req.body);
-    res.send(req.body);
+    res.status(201).send(req.body);
 });
-
+ 
 
 // -- images
 
 app.post('/library/images', async(req, res) => {
-    // 1.
     const result = validate.validateImage(req.body);
     if(result.error){
         res.status(400).send(result.error.details[0].message);
         return;
     }
     
-    // 2.
     await db.addNewImage(req.body);
-    res.send(req.body);
+    res.status(201).send(req.body);
 });
 
 
@@ -187,7 +230,7 @@ app.post('/library/images', async(req, res) => {
 // PUT
 app.put('/library/users/:userName', async(req, res) => {
     const userName = req.params.userName;
-    const user = db.getUserByName(userName);
+    const user = await db.getUserByName(userName);
     if(!user) res.status(404).send("The user doesnt exist");
 
     const result = validate.validateUser(req.body);
@@ -196,13 +239,13 @@ app.put('/library/users/:userName', async(req, res) => {
         return;
     }
 
-    await db.updateUser(req.body);
-    res.send(req.body);
+    const updatedUser = await db.updateUser(req.body);
+    res.send(updatedUser);
 })
 
 app.put('/library/subscribedUsers/:userName', async(req, res) => {
     const userName = req.params.userName;
-    const user = db.getUserByName(userName);
+    const user = await db.getUserByName(userName);
     if(!user) res.status(404).send("The subscribed user doesnt exist");
 
     const result = validate.validateSubscribedUser(req.body);
@@ -212,28 +255,38 @@ app.put('/library/subscribedUsers/:userName', async(req, res) => {
     }
 
     await db.updateSubscribedUser(req.body);
-    res.send(req.body);
+    const updatedSubscribedUser = await db.getSubscribedUserByName(userName);
+    res.send(updatedSubscribedUser); 
 });
 
-// -- books
+// -- books 
 
 app.put('/library/books/:bookid', async(req, res) => {
     const bookid = req.params.bookid;
-    const book = db.getBooksById(bookid);
+    const book = await db.getBookById(bookid);
     if(!book) res.status(404).send("The book doesnt exist");
 
     const result = validate.validateBook(req.body);
-    if(result.error){
+    if(result.error)
         res.status(400).send(result.error.details[0].message);
-        return;
-    }
 
-    await db.updateBook(req.body);
-    res.send(req.body);
+    const updateBook = await db.updateBook({BookID: bookid, ...req.body});
+    res.send(updateBook);
 });
 
+
 app.put('/library/borrowedBooks/:userName', async(req, res) => {
-    
+    const userName = req.params.userName;
+    const user = await db.getUserByName(userName);
+    if(!user) res.status(404).send("The subscribed user doesnt exist");
+
+    const borrowBookid = req.body.BorrowID;
+    const borrowBooks = await db.getUsersBorrowedBooks(userName);
+    const book = borrowBooks.find(b => parseInt(b.BorrowID) === parseInt(borrowBookid));
+    if(!book) res.status(404).send("The user is not borrowing this copy");
+
+    await db.returnBorrowedBookFromUser(borrowBookid);
+    res.send(req.body);
 });
 
 
@@ -243,8 +296,11 @@ app.put('/library/borrowedBooks/:userName', async(req, res) => {
 
 app.delete('/library/users/:userName', async(req, res) => {
     const userName = req.params.userName;
-    const user = db.getUserByName(userName);
+    const user = await db.getUserByName(userName);
     if(!user) res.status(404).send("The user doesnt exist");
+
+    const borrowBooks = await db.getUsersBorrowedBooks(userName);
+    if(borrowBooks.length > 0) res.status(400).send("The user still has books");
 
     await db.deleteUser(userName);
     res.send(user);
@@ -252,8 +308,11 @@ app.delete('/library/users/:userName', async(req, res) => {
 
 app.delete('/library/subscribedUsers/:userName', async(req, res) => {
     const subscribedUserName = req.params.userName;
-    const subscribedUser = db.getSubscribedUserByName(subscribedUserName);
+    const subscribedUser = await db.getSubscribedUserByName(subscribedUserName);
     if(!subscribedUser) res.status(404).send("The subscribed user doesnt exist");
+
+    const borrowBooks = await db.getUsersBorrowedBooks(userName);
+    if(borrowBooks.length > 0) res.status(400).send("The user still has books");
 
     await db.deleteSubscribedUser(subscribedUserName);
     res.send(subscribedUser);
@@ -261,16 +320,19 @@ app.delete('/library/subscribedUsers/:userName', async(req, res) => {
 
 app.delete('/library/books/:bookid', async(req, res) => {
     const bookid = req.params.bookid;
-    const book = db.getBooksById(bookid);
+    const book = await db.getBookById(bookid);
     if(!book) res.status(404).send("The book doesnt exist");
+
+    //לבדוק שהספר לא מושאל
 
     await db.deleteBook(bookid);
     res.send(book);
 });
 
 app.delete('/library/bookCopies/:bookid', async(req, res) => {
+        //לבדוק שהספר לא מושאל
     const copyBookid = req.params.bookid;
-    const copyBook = db.getBooksById(copyBookid);
+    const copyBook = await db.getBooksById(copyBookid);
     if(!copyBook) res.status(404).send("The copy book doesnt exist");
 
     await db.deleteCopyOfBook(copyBookid);
@@ -280,7 +342,7 @@ app.delete('/library/bookCopies/:bookid', async(req, res) => {
 app.delete('/library/favoriteBooks/:userName', async(req, res) => {
     const userName = req.params.userName;
     const user = db.getUserByName(userName);
-    if(!copyBook) res.status(404).send("The copy book doesnt exist");
+    if(!user) res.status(404).send("The copy user doesnt exist");
 
     await db.deleteCopyOfBook(copyBookid);
     res.send(copyBook);
