@@ -11,5 +11,4 @@ Server/node_modules/*
 Client/package-lock.json
 Client/package.json
 Client/node_modules/*
-Client/eslint.config.js
-Client/vite.config.js
+node_modules/*
