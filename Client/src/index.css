@@ -15,7 +15,8 @@
 
 body{
   background-color: #E1EDEB;
-
+  justify-content: center;
+  align-items: center;
 }
 
 input:focus {
