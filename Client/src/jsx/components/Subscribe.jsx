@@ -4,7 +4,7 @@ import style from './../../css/SignupPage.module.css'
 
 
 export default function Subscribe({ userData }) {
-    const { userid } = useParams();
+    const userid = localStorage.getItem('currentUser');
 
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState("");
@@ -28,22 +28,22 @@ export default function Subscribe({ userData }) {
 
         const user = {
             "Name": userid,
-            "Phone": mail,
-            "Mail": mail,
-            "Address": mail,
+            "Phone": phone.current.value,
+            "Email": mail.current.value,
+            "Address": address.current.value,
             "SubscriptionExpiration": date.toISOString()
         };
         console.log(user);
 
         const subscribeUser = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/library/subscribedUsers/${userid}`,
+                const response = await fetch(`http://localhost:3000/library/subscribedUsers`,
                     {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(updatedData),
+                        body: JSON.stringify(user),
                     });
 
                 if (!response.ok) {
@@ -54,41 +54,16 @@ export default function Subscribe({ userData }) {
                 setLoad(true);
                 setTimeout(() => {
                     setLoad(false);
-                    navigate(`/user/${userid}`);
+                    navigate(`/user/personalarea`);
                 }, 3000);
 
             }
             catch (error) {
-                setErrorMessage(error.message.toUpperCase());
+                console.error(error.message.toUpperCase());
             }
 
         }
         subscribeUser();
-
-        fetch(`http://localhost:3000/library/users`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(user)
-        }
-        )
-            .then(async (res) => {
-                if (!res.ok) {
-                    const errorText = await res.text();
-                    throw new Error(errorText);
-                }
-
-                setLoad(true);
-                setTimeout(() => {
-                    setLoad(false);
-                    localStorage.setItem('currentUser', user.Name);
-                    navigate(`/user/${user.Name}`);
-                }, 3000);
-            })
-            .catch((error) => {
-                setErrorMessage(error.message.toUpperCase());
-            });
     }
 
     return <>
@@ -157,10 +132,6 @@ export default function Subscribe({ userData }) {
                             6 Months
                         </label>
                     </div>
-                    <span id="error"
-                        className={style.error_message}>
-                        {errorMessage}
-                    </span>
                 </div>
             </section>
 
