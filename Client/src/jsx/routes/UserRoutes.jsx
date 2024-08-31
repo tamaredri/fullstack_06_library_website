@@ -13,7 +13,7 @@ export default function UserRoutes() {
     return (
         <>
             <NavigationBar/>
-            <div style={{height:'10vh', width:'100%'}}></div>
+            <div style={{height:'10vh', width:'100%', marginBottom: '4%'}}></div>
             <Routes>
                 <Route path="/subscribe" element={<Subscribe />} />
                 <Route path="/home" element={<HomePage />} />
