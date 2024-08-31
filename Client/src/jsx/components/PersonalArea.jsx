@@ -9,6 +9,7 @@ export default function PersonalArea() {
 
   const [userData, setUserData] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscriptionExpired, setIsSubscriptionExpired] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
 
@@ -28,22 +29,16 @@ export default function PersonalArea() {
 
         const data = await response.json();
         setUserData(data);
+        setIsSubscribed(true);
 
-        // Check subscription status
-        const currentDate = new Date();
-        const expirationDate = new Date(data.SubscriptionExpiration);
-        const isCurrentlySubscribed = expirationDate >= currentDate;
 
-        if (isSubscribed !== isCurrentlySubscribed) {
-          setIsSubscribed(isCurrentlySubscribed);
-        }
       } catch (error) {
         setErrorMessage(`Error fetching user data:! ${error}`);
       }
     }
 
     fetchSubscribedUsersData();
-  }, [userData]);
+  }, []);
 
 
   if (!userData) return <div>Loading..., {errorMessage}</div>;
@@ -58,11 +53,12 @@ export default function PersonalArea() {
           <UserInfo userData={userData}
             setUserData={setUserData}
             isSubscribed={isSubscribed}
-            setIsSubscribed={setIsSubscribed} />
+            isSubscriptionExpired={isSubscriptionExpired}
+            setIsSubscriptionExpired={setIsSubscriptionExpired} />
 
           <FavoriteBooks userid={userid} setError={setErrorMessage} />
 
-          <BorrowedBooks userid={userid} setError={setErrorMessage} />
+          {isSubscribed && <BorrowedBooks userid={userid} setError={setErrorMessage} />}
         </>
       )}
     </div>

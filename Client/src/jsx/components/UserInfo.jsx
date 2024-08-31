@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 
-export default function UserInfo({ userData, setUserData, isSubscribed, setIsSubscriptionExpired }) {
+export default function UserInfo({ userData, setUserData, isSubscribed, isSubscriptionExpired, setIsSubscriptionExpired }) {
     const navigate = useNavigate();
 
     const [isInfoUpdated, setIsInfoUpdated] = useState(false);
@@ -10,6 +10,22 @@ export default function UserInfo({ userData, setUserData, isSubscribed, setIsSub
     const addressRef = useRef('');
     const emailRef = useRef('');
     //const subscriptionRef = useRef('');
+
+    useEffect(() => {
+        if (isSubscribed) {
+            // Check subscription status
+            const currentDate = new Date();
+            const expirationDate = new Date(userData.SubscriptionExpiration);
+
+            console.log(expirationDate);
+            console.log(expirationDate < currentDate);
+
+            if (expirationDate < currentDate) {
+                setIsSubscriptionExpired(true);
+            }
+        }
+
+    }, [])
 
     const checkForChanges = () => {
         if (
@@ -58,10 +74,12 @@ export default function UserInfo({ userData, setUserData, isSubscribed, setIsSub
     };
 
     const handleUpdateExpirationDate = async (length) => {
-        const date = new Date(userData.SubscriptionExpiration);
+        const date = new Date();
         date.setMonth(date.getMonth() + length);
         userData.SubscriptionExpiration = date.toISOString();
+        
         handleUpdateUserInfo();
+        setIsSubscriptionExpired(false);
     }
 
     return (
@@ -71,7 +89,7 @@ export default function UserInfo({ userData, setUserData, isSubscribed, setIsSub
                     <p>Your are not subscribed.</p>
                     {/* select subscription length */}
 
-                    <button onClick={() => navigate('/signup')}>
+                    <button onClick={() => navigate(`/user/${userData.Name}/subscribe`)}>
                         Register
                     </button>
                 </>
@@ -113,13 +131,7 @@ export default function UserInfo({ userData, setUserData, isSubscribed, setIsSub
                         Update Information
                     </button>
 
-                    {isSubscribed ? (
-                        <div>
-                            <label>Subscription Expiration Date:</label>
-                            <p></p>
-                            {userData.SubscriptionExpiration.split('T')[0]}
-                        </div>
-                    ) : (
+                    {isSubscriptionExpired ? (
                         <>
                             {/* select subscription length */}
                             <p>Your subscription has expired. renew:</p>
@@ -133,6 +145,12 @@ export default function UserInfo({ userData, setUserData, isSubscribed, setIsSub
                                 6 months
                             </button>
                         </>
+                    ) : (
+                        <div>
+                            <label>Subscription Expiration Date:</label>
+                            <p></p>
+                            {userData.SubscriptionExpiration.split('T')[0]}
+                        </div>
                     )}
 
 

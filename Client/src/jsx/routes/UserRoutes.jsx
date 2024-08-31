@@ -5,6 +5,7 @@ import SingleBook from '../components/SingleBook';
 import FallBack from '../components/FallBack';
 import HomePage from '../components/HomePage';
 import PersonalArea from '../components/PersonalArea';
+import Subscribe from '../components/Subscribe';
 
 export default function UserRoutes() {
     return (
@@ -13,6 +14,7 @@ export default function UserRoutes() {
                 navigation bar
             </div>
             <Routes>
+                <Route path="/subscribe" element={<Subscribe />} />
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/personalarea" element={<PersonalArea />} />
                 <Route path="/catalog">
