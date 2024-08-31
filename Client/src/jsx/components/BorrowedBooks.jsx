@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-export default function BorrowedBooks({ userid, setError }) {
+export default function BorrowedBooks({ userid }) {
     const [borrowedBooks, setBorrowedBooks] = useState([]);
 
     // fetch borrowed books
@@ -15,7 +15,7 @@ export default function BorrowedBooks({ userid, setError }) {
 
                 setBorrowedBooks(data);
             } catch (error) {
-                setError('Error fetching user data:', error);
+                console.error('Error fetching user data:', error);
             }
         };
 
@@ -39,7 +39,7 @@ export default function BorrowedBooks({ userid, setError }) {
 
             setBorrowedBooks(prevBooks => prevBooks.filter(book => book.BorrowID !== borrowId));
         } catch (error) {
-            setError(error.message.toUpperCase());
+            console.error(error.message.toUpperCase());
         }
     };
 

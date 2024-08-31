@@ -14,7 +14,7 @@ export function validateSubscribedUser(subscribedUser) {
     const template = {
         Name: Joi.string().min(3).required(),
         Phone: Joi.string()
-            .pattern(new RegExp('^\\+?[0-9]\\d{1,14}$')) // Valid international phone number format
+            .pattern(new RegExp('^\\+?[0-9][-0-9]{1,14}$')) // Valid international phone number format
             .required(),
         Address: Joi.string().min(5).required(),
         Email: Joi.string().email().required(),
