@@ -1,24 +1,25 @@
 import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom';
-import Catalog from '../components/Catalog';
+import UserHome from '../components/UserHome';
+import CatalogPage from '../components/CatalogPage';
 import SingleBook from '../components/SingleBook';
-import FallBack from '../components/FallBack';
 import HomePage from '../components/HomePage';
 import PersonalArea from '../components/PersonalArea';
+import FallBack from '../components/FallBack';
+import NavigationBar from '../components/NavigationBar';
 import Subscribe from '../components/Subscribe';
 
 export default function UserRoutes() {
     return (
         <>
-            <div>
-                navigation bar
-            </div>
+            <NavigationBar/>
+            <div style={{height:'10vh', width:'100%'}}></div>
             <Routes>
                 <Route path="/subscribe" element={<Subscribe />} />
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/personalarea" element={<PersonalArea />} />
                 <Route path="/catalog">
-                    <Route index element={<Catalog />} />
+                    <Route index element={<CatalogPage />} />
                     <Route path=":bookid" element={<SingleBook />} />
                 </Route>
 

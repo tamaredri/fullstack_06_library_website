@@ -28,7 +28,7 @@ function LoginPage(){
         .then(user => {
             if (user.Password === password.current.value) {
                 localStorage.setItem('currentUser', user.Name);
-                navigate(`/user/${user.Name}`);
+                navigate(`/user`);
             } else {
                 setErrorMessage("WRONG PASSWORD");
             }

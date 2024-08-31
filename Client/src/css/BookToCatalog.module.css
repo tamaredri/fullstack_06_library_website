@@ -1,0 +1,42 @@
+.bookContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 11rem;
+    width: 9rem;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #D1E2E0;
+    border-radius: 5px;
+    margin: 0.5rem;
+}
+
+.bookImage {
+    height: 8rem;
+    width: 7rem;
+    border: 1px solid black;
+}
+
+.bookDetails {
+    display: flex;
+    flex-direction: column;
+    height:fit-content;
+    margin-top: 0.6rem;
+}
+
+.bookDetails h3{
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.bookDetails p{
+    font-size: 0.7rem;
+    margin: 0;
+}
+
+.favoriteIcon {
+    cursor: pointer;
+    position:relative;
+    bottom: 15px;
+    right: -52px;
+}

@@ -65,8 +65,8 @@ export default function HomePage() {
                     <button onClick={() => navigate('/signup')}>Signup</button>
                 </>) : (
                 <>
-                    <button onClick={() => navigate(`/user/${userid}/catalog`)}>Catalog</button>
-                    <button onClick={() => navigate(`/user/${userid}/personalarea`)}>Personal Area</button>
+                    <button onClick={() => navigate(`/user/catalog`)}>Catalog</button>
+                    <button onClick={() => navigate(`/user/personalarea`)}>Personal Area</button>
                 </>
             )}
 

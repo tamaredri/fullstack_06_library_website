@@ -1,37 +1,78 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
-export default function SingleBook({Title, Author, Summary, ImagePath}) {
-    const { bookid } = useParams();
-    const [copies, setCopies] = useState([]);
 
-    useEffect(() => {
-        const fetchCopies = async () => {
-          try {
-            const response = await axios.get(`http://localhost:3000/bookCopies/${bookid}`);
-            setCopies(response.data);
-          } catch (error) {
-            console.error('Error fetching book copies:', error);
-          }
-        };
+function SingleBook() {
+
+  const navigate = useNavigate();
+  const [book, setBook] = useState(null);
+  const { bookid } = useParams();
+
+  useEffect(() => {
+
     
-        fetchCopies();
-      }, [bookid]);
+    fetch(`http://localhost:3000/library/books/${bookid}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(async (res) => {
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(errorText);
+        }
+        return res.json();
+    })
+    .then((book) => {
+      getBookCopies(book.BookID, book);
+    })
+    .catch((error) => {
+      navigate(`/NotFound`);
+    });
+  }, []);
+
+  function getBookCopies(bookid, bookData) {
+    fetch(`http://localhost:3000/library/bookCopies/${bookid}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(async (res) => {
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(errorText);
+        }
+        return res.json();
+    })
+    .then((bookCopies) => {
+      setBook({ ...bookData, copies: bookCopies });
+    })
+    .catch((error) => {
+      navigate(`/NotFound`);
+    });
+};
+
+  if (book === null) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
-        <h2>SingleBook: {bookid}</h2>
+        <h2>SingleBook: {book.BookID}</h2>
       <div>
-        <img src={ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'} alt={`Cover of ${Title}`} style={{ maxWidth: '50px' }} />
+        <img src={book.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'} alt={`Cover of ${book.Title}`} style={{ maxWidth: '50px' }} />
       </div>
-      <h3>{Title}</h3>
-      <p><strong>Author:</strong> {Author || "unknown"}</p>
-      <p><strong>Summary:</strong> {Summary || "unknown"}</p>
+      <h3>{book.Title}</h3>
+      <p><strong>Author:</strong> {book.Author || "unknown"}</p>
+      <p><strong>Summary:</strong> {book.Summary || "unknown"}</p>
 
       <h3>Existing Copies</h3>
-      {copies.length > 0 ? (
+      {book.copies.length > 0 ? (
         <ul>
-          {copies.map(copy => (
+          {book.copies.map(copy => (
             <li key={copy.CopyID}>
               <strong>Copy ID:</strong> {copy.CopyID} - <strong>Status:</strong> {copy.Status}
             </li>
@@ -43,3 +84,5 @@ export default function SingleBook({Title, Author, Summary, ImagePath}) {
     </div>
   )
 }
+
+export default SingleBook;
