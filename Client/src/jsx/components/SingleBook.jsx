@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
+import style from '../../css/SingleBook.module.css'
+import bookImage from '../../icon/book.jpg'
 
 
 function SingleBook() {
@@ -60,14 +62,16 @@ function SingleBook() {
   }
 
   return (
-    <div>
-        <h2>SingleBook: {book.BookID}</h2>
-      <div>
-        <img src={book.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'} alt={`Cover of ${book.Title}`} style={{ maxWidth: '50px' }} />
+    <div style={{display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'center'}}>
+      <div className={style.header}> <span style={{color: "#294549"}}>---</span> {book.Title} {book.Author || "unknown"} <span style={{color: "#294549"}}>---</span></div>
+      <div className={style.imageAndSummaryContainer}>
+        <img className={style.bookImage} src={bookImage || book.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'} alt={`Cover of ${book.Title}`} style={{ maxWidth: '50px' }} />
+        <div className={style.SummaryContainer}>Summary:
+          <p className={style.SummaryP}>{book.Summary || "unknown"}</p>
+        </div>
       </div>
-      <h3>{book.Title}</h3>
-      <p><strong>Author:</strong> {book.Author || "unknown"}</p>
-      <p><strong>Summary:</strong> {book.Summary || "unknown"}</p>
+
+      <div></div>
 
       <h3>Existing Copies</h3>
       {book.copies.length > 0 ? (

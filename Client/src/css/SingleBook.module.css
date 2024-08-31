@@ -1,0 +1,25 @@
+.header{
+    align-self:flex-start;
+    font-size: 1.2rem;
+    color: #83633C;
+    margin-left: 1rem;
+}
+
+.imageAndSummaryContainer{
+    display: flex;
+    flex-direction: row;
+}
+
+.bookImage{
+    width: 50%;
+    height: auto;
+    margin: 5%;
+}
+
+.SummaryContainer{
+
+}
+
+.SummaryP{
+
+}

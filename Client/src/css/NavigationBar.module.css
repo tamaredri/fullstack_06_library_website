@@ -31,6 +31,7 @@
     color: #D3BE92;
     border-radius: 8px;
     padding: 4px;
+    cursor: pointer;
 }
 
 .logOut{
