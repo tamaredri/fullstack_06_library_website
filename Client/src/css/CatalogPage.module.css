@@ -1,0 +1,31 @@
+.searchLabel{
+    font-family: 'Montserrat';
+    font-size: 0.8rem;
+    margin: 5px 13px;
+    display: flex;
+    align-items: center;
+    width: 33%;
+    max-width: 10rem;
+}
+
+
+.searchInput{
+    font-family: system-ui;
+    font-size: 18px;
+    margin: 6px;
+    border: none;
+    border-bottom: 1px solid black;
+    background-color: transparent;
+    color: black;
+    width: 50%;
+}
+
+
+
+
+.catalogPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
