@@ -12,19 +12,7 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
     //const subscriptionRef = useRef('');
 
     useEffect(() => {
-        if (isSubscribed) {
-            // Check subscription status
-            const currentDate = new Date();
-            const expirationDate = new Date(userData.SubscriptionExpiration);
-
-            console.log(expirationDate);
-            console.log(expirationDate < currentDate);
-
-            if (expirationDate < currentDate) {
-                setIsSubscriptionExpired(true);
-            }
-        }
-
+        checkIsSubscriptionExpired();
     }, [])
 
     const checkForChanges = () => {
@@ -49,7 +37,6 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
         };
 
         try {
-            console.log(updatedData);
             const response = await fetch(
                 `http://localhost:3000/library/subscribedUsers/${userData.Name}`,
                 {
@@ -66,8 +53,10 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
                 throw new Error(errorText);
             }
 
+            console.log(updatedData);
             setIsInfoUpdated(false);
             setUserData(updatedData);
+            checkIsSubscriptionExpired();
         } catch (error) {
             console.error('Error updating user data:', error);
         }
@@ -79,7 +68,6 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
         userData.SubscriptionExpiration = date.toISOString();
 
         handleUpdateUserInfo();
-        setIsSubscriptionExpired(false);
     }
 
     return (
@@ -87,8 +75,6 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
             {!isSubscribed ? (
                 <>
                     <p>Your are not subscribed.</p>
-                    {/* select subscription length */}
-
                     <button onClick={() => navigate(`/user/subscribe`)}>
                         Subscribe
                     </button>
@@ -158,4 +144,17 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
             )}
         </div>
     )
+
+    function checkIsSubscriptionExpired() {
+        if (isSubscribed) {
+            // Check subscription status
+            const currentDate = new Date();
+            const expirationDate = new Date(userData.SubscriptionExpiration);
+            if (expirationDate < currentDate) {
+                setIsSubscriptionExpired(true);
+            }
+            else
+                setIsSubscriptionExpired(false);
+        }
+    }
 }
