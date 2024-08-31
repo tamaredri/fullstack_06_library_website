@@ -77,7 +77,7 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
         const date = new Date();
         date.setMonth(date.getMonth() + length);
         userData.SubscriptionExpiration = date.toISOString();
-        
+
         handleUpdateUserInfo();
         setIsSubscriptionExpired(false);
     }
@@ -89,8 +89,8 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
                     <p>Your are not subscribed.</p>
                     {/* select subscription length */}
 
-                    <button onClick={() => navigate(`/user/${userData.Name}/subscribe`)}>
-                        Register
+                    <button onClick={() => navigate(`/user/subscribe`)}>
+                        Subscribe
                     </button>
                 </>
             ) : (
