@@ -4,7 +4,6 @@ import SignupPage from './jsx/components/SignupPage';
 import UserRoutes from './jsx/routes/UserRoutes';
 import FallBack from './jsx/components/FallBack';
 import HomePage from './jsx/components/HomePage';
-import { useState } from 'react';
 
 const App = () => {
 
@@ -12,18 +11,19 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path='/login' element={<LoginPage/>} />
-      <Route path='/signup' element={<SignupPage/>} />
-      <Route path='/homepage/*' element={user === null ? (
+      <Route path='/login' element={<LoginPage />} />
+      <Route path='/signup' element={<SignupPage />} />
+      
+      <Route path='/homepage' element={localStorage.getItem('currentUser') === null ? (
         <HomePage />) : (
-        <Navigate to={`/user`} />
+        <Navigate to='/user' />
       )} />
       <Route path='/user/*' element={<UserRoutes />} />
 
       <Route path="/"
-        element={user === null ? (
+        element={localStorage.getItem('currentUser') === null ? (
           <Navigate to="/homepage" />) : (
-          <Navigate to={`/user`} />
+          <Navigate to='/user' />
         )} />
       <Route path="*" element={<FallBack />} />
     </Routes>

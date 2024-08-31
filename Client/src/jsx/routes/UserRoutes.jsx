@@ -14,6 +14,7 @@ export default function UserRoutes() {
         <>
             <NavigationBar/>
             <div style={{height:'10vh', width:'100%'}}></div>
+
             <Routes>
                 <Route path="/subscribe" element={<Subscribe />} />
                 <Route path="/home" element={<HomePage />} />
