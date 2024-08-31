@@ -50,7 +50,7 @@ function SignupPage(){
             setTimeout(() => {
                 setLoad(false);
                 localStorage.setItem('currentUser', user.Name);
-                navigate(`/user/${user.Name}`);
+                navigate(`/user`);
             }, 3000);
         })
         .catch((error) => {

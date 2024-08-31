@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 
 function SingleBook() {
 
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
+  const { bookid } = useParams();
 
   useEffect(() => {
-    const pathname = window.location.pathname;
-    const pathSegments = pathname.split('/');
-    const bookid = pathSegments[pathSegments.length - 1];
+
     
     fetch(`http://localhost:3000/library/books/${bookid}`, {
         method: 'GET',

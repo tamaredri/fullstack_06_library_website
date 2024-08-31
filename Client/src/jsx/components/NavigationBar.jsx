@@ -7,19 +7,16 @@ import { useState } from "react";
 function NavigationBar(){
     const navigate = useNavigate();
     const userName = localStorage.getItem('currentUser');
-    const [isSubscribe, setIsSubscribe] = useState(true);
-
-    
     
     return <>
         <div className={style.navContainer}>
             <div className={style.leftBar}>
             <img className={style.logo} src={logo}/>
-            {(isSubscribe) && <div className={style.navButton} onClick={()=>{navigate(`/user/${userName}/personalArea`)}}>User</div>}
-            <div className={style.navButton} onClick={()=>{navigate(`/user/${userName}/catalog`)}}>Catalog</div>
-            <div className={style.navButton} onClick={()=>{navigate(`/user/${userName}/Home`)}}>Home</div>
+            <div className={style.navButton} onClick={()=>{navigate(`/user/personalarea`)}}>User</div>
+            <div className={style.navButton} onClick={()=>{navigate(`/user/catalog`)}}>Catalog</div>
+            <div className={style.navButton} onClick={()=>{navigate(`/user/home`)}}>Home</div>
             </div>
-            <img className={style.logOut} src={logOut} onClick={() =>{localStorage.setItem('currentUser', null); navigate('/login')}} />
+            <img className={style.logOut} src={logOut} onClick={() =>{localStorage.removeItem('currentUser'); navigate('/homepage')}} />
 
         </div>
     </>

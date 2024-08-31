@@ -5,7 +5,7 @@ import BorrowedBooks from './BorrowedBooks';
 import UserInfo from './UserInfo';
 
 export default function PersonalArea() {
-  const { userid } = useParams();
+  const userid = localStorage.getItem('currentUser');
 
   const [userData, setUserData] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -50,7 +50,7 @@ export default function PersonalArea() {
 
   return (
     <div>
-      {userid != localStorage.getItem('currentUser') ? (<Navigate to='homepage' />) : (
+      {userid === null ? (<Navigate to='/homepage' />) : (
         <>
           <h2>Hey, {userData.Name} </h2>
           {errorMessage && <p>Error: {errorMessage}</p>}

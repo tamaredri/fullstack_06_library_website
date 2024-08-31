@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import UserHome from '../components/UserHome';
 import CatalogPage from '../components/CatalogPage';
 import SingleBook from '../components/SingleBook';
-import FallBack from '../components/FallBack';
 import HomePage from '../components/HomePage';
 import PersonalArea from '../components/PersonalArea';
 import FallBack from '../components/FallBack';
