@@ -58,12 +58,14 @@ export default function PersonalArea() {
               setIsSubscriptionExpired={setIsSubscriptionExpired} />
 
             <div className={style.hr}></div>
+            <div className={style.personarareaContainer}>
 
-            <FavoriteBooks userid={userid} setError={setErrorMessage} />
+              <FavoriteBooks userid={userid} setError={setErrorMessage} />
 
-            <div className={style.hr}></div>
+              {isSubscribed && <div className={style.hrLast}></div>}
 
-            {isSubscribed && <BorrowedBooks userid={userid} setError={setErrorMessage} />}
+              {isSubscribed && <BorrowedBooks userid={userid} setError={setErrorMessage} />}
+            </div>
         </div>
       )}
     </div>
