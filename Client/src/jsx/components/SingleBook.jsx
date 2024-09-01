@@ -133,7 +133,8 @@ function SingleBook() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      width: '100vw'
     }}>
 
       {localStorage.getItem('currentUser') === null ? (<Navigate to='/homepage' />) :
@@ -142,48 +143,59 @@ function SingleBook() {
             <div className={style.header}>
               <span style={{ color: "#294549" }}>---</span> {bookInfo.Title} {bookInfo.Author || "unknown"} <span style={{ color: "#294549" }}>---</span>
             </div>
-            <div className={style.imageAndSummaryContainer}>
-              <img className={style.bookImage}
-                src={bookInfo.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'}
-                alt={`Cover of ${bookInfo.Title}`} />
 
-              <div className={style.SummaryContainer}>Summary:
-                <p className={style.SummaryP}>{bookInfo.Summary || "unknown"}</p>
+            <div className={style.pageContainer}>
+
+              <div className={style.imageAndSummaryContainer}>
+                <img className={style.bookImage}
+                  src={bookInfo.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'}
+                  alt={`Cover of ${bookInfo.Title}`} />
+
+                <div className={style.SummaryContainer}>Summary:
+                  <p className={style.SummaryP}>{bookInfo.Summary || "unknown"}</p>
+                </div>
               </div>
+
+              <div className={style.hr}></div>
+
+              <div style={{
+                display: 'flex', 
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
+              {isSubscribed &&
+                <button
+                  className={style.borrowButtun}
+                  onClick={BorrowBook}
+                  disabled={!isCopyAvailable}
+
+                >BORROW</button>}
+              {load && <div className={style_for_load.blur_overlay}></div>}
+              {load && <div className={style_for_load.success_animation}>✔</div>}
+
+              {!isCopyAvailable && bookInfo.copies.length > 0 && <p>All copies are taken</p>}
+
+              {bookInfo.copies.length > 0 ? (
+                <ul className={style.bookList}>
+                  {bookInfo.copies.map(copy => (
+                    <li className={style.bookInList} key={copy.CopyID}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span><strong>Copy ID:</strong> {copy.CopyID}</span>
+                        <span><strong>Status:</strong> {copy.Status}</span>
+                      </div>
+
+                      <img className={style.blackBook} src={blackBook} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No copies were found.</p>
+              )}
             </div>
-
-            <div className={style.hr}></div>
-
-            {isSubscribed &&
-              <button
-                className={style.borrowButtun}
-                onClick={BorrowBook}
-                disabled={!isCopyAvailable}
-
-              >BORROW</button>}
-            {load && <div className={style_for_load.blur_overlay}></div>}
-            {load && <div className={style_for_load.success_animation}>✔</div>}
-            
-            {!isCopyAvailable && bookInfo.copies.length > 0 && <p>All copies are taken</p>}
-
-            {bookInfo.copies.length > 0 ? (
-              <ul className={style.bookList}>
-                {bookInfo.copies.map(copy => (
-                  <li className={style.bookInList} key={copy.CopyID}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span><strong>Copy ID:</strong> {copy.CopyID}</span>
-                      <span><strong>Status:</strong> {copy.Status}</span>
-                    </div>
-
-                    <img className={style.blackBook} src={blackBook} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No copies were found.</p>
-            )}
-          </>)}
-    </div>
+          </div>
+    </>)
+}
+    </div >
   )
 }
 
