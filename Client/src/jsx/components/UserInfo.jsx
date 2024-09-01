@@ -12,7 +12,6 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
     const phoneRef = useRef('');
     const addressRef = useRef('');
     const emailRef = useRef('');
-    //const subscriptionRef = useRef('');
 
     useEffect(() => {
         checkIsSubscriptionExpired();
@@ -93,7 +92,7 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
     return (
         <div>
             {!isSubscribed ? (
-                <div style={{display: 'flex', flexDirection:'column', alignItems:'center'}}>
+                <div style={{display: 'flex', flexDirection:'column', alignItems:'center', width: '100vw'}}>
                     <div className={style.infoContainer}>
                         <img className={style.userImage} src={userIcon}/>
                         <div  className={style.infoField}>
@@ -102,7 +101,7 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
                         </div>
                     </div>
                     <p>Your are not subscribed.</p>
-                    <button className={style.updateBotton} onClick={() => navigate(`/user/subscribe`)}>
+                    <button className={style.subscribeBotton} onClick={() => navigate(`/user/subscribe`)}>
                         Subscribe
                     </button>
                 </div>
@@ -110,38 +109,41 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
                 <div style={{display: 'flex', flexDirection:'column', alignItems:'center'}}>
                     <div className={style.infoContainer}>
                         <img className={style.userImage} src={userIcon}/>
-                        <div>
-                            <div className={style.infoField}>
-                            <label className={style.infoFieldLabel}>Name: </label>
-                            {userData.Name}
+                        <div style={{display: 'flex', flexDirection:'column'}}>
+                            <div className={style.twoInfoFielsa}>
+                                <div className={style.infoField}>
+                                <label className={style.infoFieldLabel}>Name: </label>
+                                {userData.Name}
+                                </div>
+                                <div className={style.infoField}>
+                                    <label className={style.infoFieldLabel}>Phone:</label>
+                                    <input 
+                                        type="text"
+                                        defaultValue={userData.Phone}
+                                        ref={phoneRef}
+                                        onBlur={checkForChanges}
+                                    />
+                                </div>
                             </div>
-                            <div className={style.infoField}>
-                                <label className={style.infoFieldLabel}>Phone:</label>
-                                <input 
-                                    type="text"
-                                    defaultValue={userData.Phone}
-                                    ref={phoneRef}
-                                    onBlur={checkForChanges}
-                                />
-                            </div>
-                        
-                            <div className={style.infoField}>
-                                <label className={style.infoFieldLabel}>Address:</label>
-                                <input
-                                    type="text"
-                                    defaultValue={userData.Address}
-                                    ref={addressRef}
-                                    onBlur={checkForChanges}
-                                />
-                            </div>
-                            <div className={style.infoField}>
-                                <label className={style.infoFieldLabel}>Email:</label>
-                                <input
-                                    type="text"
-                                    defaultValue={userData.Email}
-                                    ref={emailRef}
-                                    onBlur={checkForChanges}
-                                />
+                            <div className={style.twoInfoFielsa}>
+                                <div className={style.infoField}>
+                                    <label className={style.infoFieldLabel}>Address:</label>
+                                    <input
+                                        type="text"
+                                        defaultValue={userData.Address}
+                                        ref={addressRef}
+                                        onBlur={checkForChanges}
+                                    />
+                                </div>
+                                <div className={style.infoField}>
+                                    <label className={style.infoFieldLabel}>Email:</label>
+                                    <input
+                                        type="text"
+                                        defaultValue={userData.Email}
+                                        ref={emailRef}
+                                        onBlur={checkForChanges}
+                                    />
+                                </div>
                             </div>
                             <button className={style.updateBotton} onClick={handleUpdateUserInfo} disabled={!isInfoUpdated}>
                             Update

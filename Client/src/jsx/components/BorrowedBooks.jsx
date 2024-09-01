@@ -47,7 +47,7 @@ export default function BorrowedBooks({ userid }) {
     return (
         <>
             {borrowedBooks.length > 0 && (
-                <>
+                <div className={style.booksContainer}>
                     <h3 className={style.favoriteHeader}>Books Borrowed</h3>
                     <ul className={style.bookList}>
                         {borrowedBooks.map((book) => (
@@ -59,7 +59,7 @@ export default function BorrowedBooks({ userid }) {
                             </li>
                         ))}
                     </ul>
-                </>
+                </div>
             )}
         </>
     )

@@ -26,7 +26,7 @@ export default function FavoriteBooks({ userid, setError }) {
   return (
     <>
       {favorites.length > 0 && (
-        <>
+        <div className={style.booksContainer}>
           <h3 className={style.favoriteHeader}>Favorite Books</h3>
 
           <ul className={style.bookList}>
@@ -39,7 +39,7 @@ export default function FavoriteBooks({ userid, setError }) {
               </li>
             ))}
           </ul>
-        </>)}
+        </div>)}
     </>
   )
 }

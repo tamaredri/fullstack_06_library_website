@@ -1,7 +1,25 @@
+.personarareaContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    
+}
 
-.hr{
+.hr, .hrLast{
     width: 70%;
     height: 0.5px;
     background-color: #294549;
     margin: 4%;
+}
+
+
+
+@media screen and (min-width: 1024px) {
+    .personarareaContainer{
+        flex-direction: row;
+    }
+    .hrLast{
+        width: 0.5px;
+        height: 7rem;
+    }
 }
