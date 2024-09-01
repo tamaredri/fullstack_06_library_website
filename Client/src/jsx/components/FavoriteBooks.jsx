@@ -33,7 +33,9 @@ export default function FavoriteBooks({ userid, setError }) {
             {favorites.map((book) => (
               <li className={style.bookInList} key={book.BookID}>
                   <span>{book.Title}</span>
-                  <img className={style.bookIcon} src={book.ImagePath || "https://cdn-icons-png.flaticon.com/128/2232/2232688.png"} style={{ maxWidth: '50px' }} />
+                <a href={`/user/catalog/${book.BookID}`} style={{ maxWidth: '25%', padding: 'none' }}>
+                  <img  className={style.bookIcon} src={book.ImagePath || "https://cdn-icons-png.flaticon.com/128/2232/2232688.png"}  />
+                </a>
               </li>
             ))}
           </ul>
