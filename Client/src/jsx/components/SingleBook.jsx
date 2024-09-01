@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import style from '../../css/SingleBook.module.css'
 import bookImage from '../../icon/book.jpg'
 import blackBook from '../../icon/blackBook.png'
+import style_for_load from '../../css/UserInfo.module.css'
 
 
 function SingleBook() {
@@ -14,6 +15,7 @@ function SingleBook() {
   const [bookInfo, setBookInfo] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isCopyAvailable, setIsCopyAvailable] = useState(false);
+  const [load, setLoad] = useState(false);
 
 
   useEffect(() => {
@@ -109,6 +111,11 @@ function SingleBook() {
           return result;
         });
 
+        setLoad(true);
+        setTimeout(() => {
+          setLoad(false);
+        }, 3000);
+
       } catch (error) {
         console.error(`Error fetching user data:! ${error}`);
       }
@@ -154,6 +161,10 @@ function SingleBook() {
                 disabled={!isCopyAvailable}
 
               >BORROW</button>}
+            {load && <div className={style_for_load.blur_overlay}></div>}
+            {load && <div className={style_for_load.success_animation}>✔</div>}
+            
+            {!isCopyAvailable && bookInfo.copies.length > 0 && <p>All copies are taken</p>}
 
             {bookInfo.copies.length > 0 ? (
               <ul className={style.bookList}>
