@@ -33,9 +33,16 @@
 
 .registration{
     margin: 1rem;
-    width: 10rem;
+    width: 6rem;
     background-color: #294549;
     color: #D0E2E0;
+}
+
+.registretionContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
 }
 
 

@@ -8,6 +8,7 @@
     margin-top: 1rem;
     font-weight: 600;
     border: none;
+    font-size: 1rem;
 }
 .submit:hover{
     background-color: #29454989;
@@ -26,7 +27,7 @@
 
 .register_span{
     font-family: system-ui;
-    font-size: 0.7rem;
+    font-size: 1rem;
     margin-top: 0.5rem;
     color: transparent;
 }
@@ -44,7 +45,7 @@
     width: 13rem;
     border: 0.05rem solid black;
     padding: 0.7rem;
-    font-size: 1rem;
+    font-size: 1.5rem;
     font-weight: 600;
     background-color: transparent;
 }

@@ -161,7 +161,8 @@ function SingleBook() {
               <div style={{
                 display: 'flex', 
                 flexDirection: 'column',
-                alignItems: 'center'
+                alignItems: 'center',
+                marginRight: '2rem'
               }}>
               {isSubscribed &&
                 <button

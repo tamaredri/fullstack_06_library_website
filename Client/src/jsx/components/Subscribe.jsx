@@ -75,6 +75,8 @@ export default function Subscribe({ userData }) {
         </p>
 
         <form className={style.register_form} onSubmit={submitSubscription}>
+                <div className={style.buttonsContainer}>
+
                     <input className={style.register_input}
                         ref={phone}
                         id="phone"
@@ -93,9 +95,10 @@ export default function Subscribe({ userData }) {
                         type="text"
                         placeholder="Address"
                         required />
+                        </div>
 
-                    <p style={{width: 'fit-content'}}>select your subscription length:</p>
-
+                    <p style={{width: '100vw', textAlign:"center"}}>select your subscription length:</p>
+                        <div className={style.buttonsContainer}>
                         <label>
                             <input
                                 type="radio"
@@ -124,6 +127,7 @@ export default function Subscribe({ userData }) {
                             />
                             6 Months
                         </label>
+                        </div>
 
             <input className={`${style.register_input} ${style.submit}`}
                 type="submit"

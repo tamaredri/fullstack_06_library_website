@@ -1,8 +1,14 @@
 .register_form{
+    display: flex;
+    justify-content: center;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    margin-left: 15%;
+}
+
+.buttonsContainer{
+    display: flex;
+    flex-direction: column;
 }
 
 .register_input{
@@ -93,5 +99,21 @@
 
 .form_disabled {
     pointer-events: none;
+}
+
+.register_input{
+    font-size: 1rem;
+}
+
+
+
+@media screen and (min-width: 1024px) {
+    .buttonsContainer{
+        flex-direction: row;
+    }
+    .register_input{
+        width: 8rem;
+        font-size: 1rem;
+    }
 }
 

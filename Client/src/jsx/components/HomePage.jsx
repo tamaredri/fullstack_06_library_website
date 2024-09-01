@@ -60,7 +60,7 @@ export default function HomePage() {
         <div className={style.homePage}>
             <h1 className={style.header}>Katzrin Library</h1>
             {localStorage.getItem("currentUser") === null &&
-                <div>
+                <div className={style.registretionContainer}>
                     <button className={style.registration} onClick={() => navigate('/login')}>Login</button>
                     <button className={style.registration} onClick={() => navigate('/signup')}>Signup</button>
                 </div>
