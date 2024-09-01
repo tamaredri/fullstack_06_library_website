@@ -8,18 +8,80 @@
 .imageAndSummaryContainer{
     display: flex;
     flex-direction: row;
+    width: 100%;
+    justify-content: center;
+    margin-top: 3%;
 }
 
 .bookImage{
-    width: 50%;
+    display: inline-block;
+    width: 40%;
     height: auto;
-    margin: 5%;
+    margin: 3%;
 }
 
 .SummaryContainer{
-
+    display: inline-block;
+    width: 50%;
+    height: 100%;
+    margin: 3%;
+    color: #1F758F;
+    font-weight: 600;
+    font-size: 0.8rem;
 }
 
 .SummaryP{
+    background-color: #C8DDDB;
+    border-radius: 0 15px 15px 15px;
+    padding: 10px;
+    height: 100%;
+    color: black;
+    font-weight: 100;
+}
 
+.hr{
+    width: 70%;
+    height: 0.5px;
+    background-color: #294549;
+    margin: 4%;
+}
+
+.bookList{
+    display: flex;
+    justify-content: center;
+    flex-flow: wrap;
+    padding: 0;
+}
+
+.bookInList{
+    width: 11rem;
+    height: auto;
+    padding: 8px;
+    margin: 5px;
+    background-color: #C8DDDB;
+    border-radius: 15px 15px 0 15px;
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+}
+
+.blackBook{
+    width: 25%;
+    margin-left: 4px;
+}
+
+.borrowButtun{
+    border-radius: 0;
+    border: 0.09rem solid #294549;
+    background-color: transparent;
+    font-family: system-ui;
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 0.3rem 1.2rem;
+    margin-top: 2rem;
+    color: #294549;
+}
+
+.borrowButtun:hover{
+    background-color: rgba(255, 255, 255, 0.292);
 }

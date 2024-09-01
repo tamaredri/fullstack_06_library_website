@@ -12,9 +12,8 @@ import Subscribe from '../components/Subscribe';
 export default function UserRoutes() {
     return (
         <>
-            <NavigationBar />
-            <div style={{ height: '10vh', width: '100%' }}></div>
-
+            <NavigationBar/>
+            <div style={{height:'10vh', width:'100%', marginBottom: '4%'}}></div>
             <Routes>
                 <Route path="/subscribe" element={<Subscribe />} />
                 <Route path="/home" element={localStorage.getItem('currentUser') === null ? (

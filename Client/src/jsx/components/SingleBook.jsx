@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import style from '../../css/SingleBook.module.css'
 import bookImage from '../../icon/book.jpg'
+import blackBook from '../../icon/blackBook.png'
 
 
 function SingleBook() {
@@ -65,20 +66,25 @@ function SingleBook() {
     <div style={{display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'center'}}>
       <div className={style.header}> <span style={{color: "#294549"}}>---</span> {book.Title} {book.Author || "unknown"} <span style={{color: "#294549"}}>---</span></div>
       <div className={style.imageAndSummaryContainer}>
-        <img className={style.bookImage} src={bookImage || book.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'} alt={`Cover of ${book.Title}`} style={{ maxWidth: '50px' }} />
+        <img className={style.bookImage} src={bookImage || book.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'} alt={`Cover of ${book.Title}`}/>
         <div className={style.SummaryContainer}>Summary:
           <p className={style.SummaryP}>{book.Summary || "unknown"}</p>
         </div>
       </div>
 
-      <div></div>
+      <div className={style.hr}></div>
 
-      <h3>Existing Copies</h3>
+      <button className={style.borrowButtun}>BORROW</button>
       {book.copies.length > 0 ? (
-        <ul>
+        <ul className={style.bookList}>
           {book.copies.map(copy => (
-            <li key={copy.CopyID}>
-              <strong>Copy ID:</strong> {copy.CopyID} - <strong>Status:</strong> {copy.Status}
+            <li className={style.bookInList} key={copy.CopyID}>
+              <div style={{display:'flex', flexDirection:'column'}}>
+                <span><strong>Copy ID:</strong> {copy.CopyID}</span>
+                <span><strong>Status:</strong> {copy.Status}</span>
+              </div>
+             
+              <img className={style.blackBook} src={blackBook}/>
             </li>
           ))}
         </ul>
