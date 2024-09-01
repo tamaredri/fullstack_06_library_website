@@ -7,6 +7,7 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
     const navigate = useNavigate();
 
     const [isInfoUpdated, setIsInfoUpdated] = useState(false);
+    const [load, setLoad] = useState(false);
 
     const phoneRef = useRef('');
     const addressRef = useRef('');
@@ -59,6 +60,11 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
             setIsInfoUpdated(false);
             setUserData(updatedData);
             checkIsSubscriptionExpired();
+
+            setLoad(true);
+            setTimeout(() => {
+                setLoad(false);
+            }, 3000);
         } catch (error) {
             console.error('Error updating user data:', error);
         }
@@ -161,6 +167,9 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
 
                 </div>
             )}
+
+            {load && <div className={style.blur_overlay}></div>}
+            {load && <div className={style.success_animation}>✔</div>}
         </div>
     )
 

@@ -20,7 +20,8 @@ function NavigationBar() {
                 onClick={() => {
                     console.log('logout', localStorage.getItem('currentUser'));
                     localStorage.removeItem('currentUser');
-                    navigate('/homepage');
+                    navigate('/homepage', {'replace': true});
+                    window.location.reload(); 
                 }} />
 
         </div>

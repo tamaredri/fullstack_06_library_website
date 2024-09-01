@@ -12,12 +12,12 @@ const pool = mysql.createPool({
 
 // GET functions
 // -- users
-export async function getUserByName(Name){
+export async function getUserByName(Name) {
     const [rows] = await pool.query("SELECT * from users where Name=?;", [Name]);
     return rows[0];
 }
 
-export async function getSubscribedUserByName(Name){
+export async function getSubscribedUserByName(Name) {
     const [rows] = await pool.query(`
         SELECT 
             u.Name,
@@ -35,38 +35,46 @@ export async function getSubscribedUserByName(Name){
 `, [Name]);
     return rows[0];
 }
-    
+
 // -- books
-export async function getBooks(){
+export async function getBooks() {
     const [rows] = await pool.query("SELECT BookID, Title, Author, ImagePath from books;");
     return rows;
 }
 
-export async function getBookById(id){
+export async function getBookById(id) {
     const [rows] = await pool.query("SELECT * from books WHERE BookID=?;", [id]);
     return rows[0];
 }
 
-export async function getBookByTitle(title){
+export async function getBookByTitle(title) {
     const [rows] = await pool.query("SELECT * from books WHERE Title=?;", [title]);
     return rows[0];
 }
 
-export async function getBookCopiesByID(BookID){
+export async function getBookCopiesByID(BookID) {
     const [rows] = await pool.query(`
         SELECT 
             bc.CopyID,
-            IF(bb.BorrowDate IS NOT NULL AND bb.ReturnDate IS NULL, 'Borrowed', 'Available') AS Status
+            bc.BookID,
+            CASE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM BorrowedBooks bb
+                    WHERE bb.CopyID = bc.CopyID
+                    AND bb.returnDate IS NULL
+                ) THEN 'Borrowed'
+                ELSE 'Available'
+            END AS Status
         FROM 
             BookCopies bc
-        LEFT JOIN 
-            BorrowedBooks bb ON bc.CopyID = bb.CopyID
-        WHERE bc.BookID = ?;`, 
+        WHERE 
+            bc.BookID = ?;`,
         [BookID]);
     return rows;
 }
 
-export async function getSingleBookCopyByID(CopyID){
+export async function getSingleBookCopyByID(CopyID) {
     const [rows] = await pool.query(`
         SELECT 
             bc.CopyID,
@@ -75,13 +83,13 @@ export async function getSingleBookCopyByID(CopyID){
             BookCopies bc
         LEFT JOIN 
             BorrowedBooks bb ON bc.CopyID = bb.CopyID
-        WHERE bc.CopyID = ?;`, 
+        WHERE bc.CopyID = ?;`,
         [CopyID]);
     return rows[0];
 }
 
 // -- books and users
-export async function getUsersFavoriteBooks(Name){
+export async function getUsersFavoriteBooks(Name) {
     const [rows] = await pool.query(`
         SELECT 
             b.BookID, 
@@ -97,7 +105,7 @@ export async function getUsersFavoriteBooks(Name){
     return rows;
 }
 
-export async function getUsersBorrowedBooks(Name){
+export async function getUsersBorrowedBooks(Name) {
     const [rows] = await pool.query(`
         SELECT 
             b.BookID,
@@ -118,7 +126,7 @@ export async function getUsersBorrowedBooks(Name){
     return rows;
 }
 
-export async function getUsersBorrowHistory(UserID){
+export async function getUsersBorrowHistory(UserID) {
     const [rows] = await pool.query(`
         SELECT 
             b.BookID,
@@ -140,12 +148,12 @@ export async function getUsersBorrowHistory(UserID){
 }
 
 // -- quotes
-export async function getAllQuotes(){
+export async function getAllQuotes() {
     const [rows] = await pool.query("SELECT * from quotes;");
     return rows;
 }
 
-export async function getAllImages(){
+export async function getAllImages() {
     const [rows] = await pool.query("SELECT * from LibraryImages;");
     return rows;
 }
@@ -153,40 +161,40 @@ export async function getAllImages(){
 
 // POST
 // -- users
-export async function registerNewUser({Name, Password}){
+export async function registerNewUser({ Name, Password }) {
     await pool.query(
-        'INSERT INTO Users (Name, Password) VALUES (?, ?)', 
+        'INSERT INTO Users (Name, Password) VALUES (?, ?)',
         [Name, Password]);
-    return {Name, Password};
+    return { Name, Password };
 }
 
-export async function subscribeNewUser({Name, Phone, Address, Email, SubscriptionExpiration}){
+export async function subscribeNewUser({ Name, Phone, Address, Email, SubscriptionExpiration }) {
     await pool.query(
         'INSERT INTO SubscribedUsers (Name, Phone, Address, Email, SubscriptionExpiration) VALUES (?, ?, ?, ?, ?)',
         [Name, Phone, Address, Email, new Date(SubscriptionExpiration)]);
 }
 
 // -- books
-export async function addNewBook({Title, Author, Summary, ImagePath}){
-    const [result] = await pool.query('INSERT INTO Books (Title, Author, Summary, ImagePath) VALUES (?, ?, ?, ?)', [Title, Author,  Summary || null, ImagePath || null]);
+export async function addNewBook({ Title, Author, Summary, ImagePath }) {
+    const [result] = await pool.query('INSERT INTO Books (Title, Author, Summary, ImagePath) VALUES (?, ?, ?, ?)', [Title, Author, Summary || null, ImagePath || null]);
     return result.insertId;
 }
 
-export async function addNewCopyOfBook(BookID){
+export async function addNewCopyOfBook(BookID) {
     const [result] = await pool.query(`INSERT INTO BookCopies (BookID) VALUES (?);`, [BookID]);
     return result.insertId;
 }
 
 // -- books and users
-export async function addFavoriteBookToUser(UserName, BookID){
+export async function addFavoriteBookToUser(UserName, BookID) {
     await pool.query(
         'INSERT INTO FavoriteBooks (Name, BookID) VALUES (?, ?);',
         [UserName, BookID]
     );
-    return { Name: UserName, BookID};
+    return { Name: UserName, BookID };
 }
 
-export async function addBorrowedBookToUser({ Name, CopyID }){
+export async function addBorrowedBookToUser({ Name, CopyID }) {
 
     // Insert the borrow record
     await pool.query(
@@ -197,14 +205,14 @@ export async function addBorrowedBookToUser({ Name, CopyID }){
 }
 
 // -- quotes
-export async function addNewQuote(newQuote){
+export async function addNewQuote(newQuote) {
     await pool.query(`
     INSERT INTO Quotes (Quote) 
     VALUES (?);
     `, [newQuote]);
 }
 
-export async function addNewImage(newImagePath){
+export async function addNewImage(newImagePath) {
     await pool.query(`
         INSERT INTO LibraryImages (ImagePath) 
         VALUES (?);
@@ -214,22 +222,22 @@ export async function addNewImage(newImagePath){
 
 // PUT
 // -- users
-export async function updateUser({Name, Password}) {
-    
+export async function updateUser({ Name, Password }) {
+
     await pool.query(
         'UPDATE Users SET Password = ? WHERE Name = ?',
         [Password, Name]
     );
-    return {Name, Password};
+    return { Name, Password };
 }
 
 
-export async function updateSubscribedUser({Name, Phone, Address, Email, SubscriptionExpiration}){
+export async function updateSubscribedUser({ Name, Phone, Address, Email, SubscriptionExpiration }) {
     let query = 'UPDATE SubscribedUsers SET ';
     const params_list = [];
 
     if (Phone !== undefined) {
-        query += 'Phone = ?, '; 
+        query += 'Phone = ?, ';
         params_list.push(Phone);
     }
     if (Address !== undefined) {
@@ -245,17 +253,17 @@ export async function updateSubscribedUser({Name, Phone, Address, Email, Subscri
         params_list.push(new Date(SubscriptionExpiration));
     }
 
-    if (params_list.length > 0){
+    if (params_list.length > 0) {
         query = query.slice(0, -2) + ' WHERE Name = ?';
         params_list.push(Name);
-    
+
         await pool.query(query, params_list);
-    } 
-    return {Name, Phone, Address, Email, SubscriptionExpiration};
+    }
+    return { Name, Phone, Address, Email, SubscriptionExpiration };
 }
 
 // -- books
-export async function updateBook({BookID, Title, Author, Summary, ImagePath}){
+export async function updateBook({ BookID, Title, Author, Summary, ImagePath }) {
     let query = 'UPDATE Books SET ';
     const params_list = [];
 
@@ -276,19 +284,19 @@ export async function updateBook({BookID, Title, Author, Summary, ImagePath}){
         query += 'ImagePath = ?, ';
         params_list.push(ImagePath);
     }
- 
+
     query = query.slice(0, -2) + ' WHERE BookID = ?';
     params_list.push(BookID);
-    
+
     await pool.query(query, params_list);
     console.log(query);
     console.log(params_list);
-    return {BookID, Title, Author, Summary, ImagePath};
+    return { BookID, Title, Author, Summary, ImagePath };
 }
 
 
 // -- books and users
-export async function returnBorrowedBookFromUser(borrowID){
+export async function returnBorrowedBookFromUser(borrowID) {
     await pool.query(
         'UPDATE BorrowedBooks SET ReturnDate = CURDATE() WHERE BorrowID = ?',
         [borrowID]
@@ -306,26 +314,26 @@ export async function deleteUser(UserName) {
     await pool.query('DELETE FROM Users WHERE Name = ?', [UserName]);
 }
 
-export async function deleteSubscribedUser(UserName){
+export async function deleteSubscribedUser(UserName) {
     await pool.query('DELETE FROM BorrowedBooks WHERE Name = ?', [UserName]);
     await pool.query('DELETE FROM SubscribedUsers WHERE Name = ?', [UserName]);
 }
 
 // -- books
-export async function deleteBook(BookID){
+export async function deleteBook(BookID) {
     await pool.query('DELETE FROM FavoriteBooks WHERE BookID = ?', [BookID]);
     await pool.query('DELETE FROM BorrowedBooks WHERE CopyID IN (SELECT CopyID FROM BookCopies WHERE BookID = ?)', [BookID]);
     await pool.query('DELETE FROM BookCopies WHERE BookID = ?', [BookID]);
     await pool.query('DELETE FROM Books WHERE BookID = ?', [BookID]);
 }
 
-export async function deleteCopyOfBook(CopyID){
+export async function deleteCopyOfBook(CopyID) {
     await pool.query('DELETE FROM BorrowedBooks WHERE CopyID = ?', [CopyID]);
     await pool.query('DELETE FROM BookCopies WHERE CopyID = ?', [CopyID]);
 }
 
 // -- books and users
-export async function deleteFavoriteBookFromUser(UserName, BookID){
+export async function deleteFavoriteBookFromUser(UserName, BookID) {
     await pool.query(
         'DELETE FROM FavoriteBooks WHERE Name = ? AND BookID = ?',
         [UserName, BookID]
@@ -333,7 +341,7 @@ export async function deleteFavoriteBookFromUser(UserName, BookID){
 }
 
 // -- quotes
-export async function deleteQuote(QouteID){
+export async function deleteQuote(QouteID) {
     await pool.query(`
         DELETE FROM Quotes
         WHERE QuoteID = (?);
@@ -341,8 +349,8 @@ export async function deleteQuote(QouteID){
 
 }
 
-export async function deleteImage(ImageID){
-        await pool.query(`
+export async function deleteImage(ImageID) {
+    await pool.query(`
         DELETE FROM LibraryImages
         WHERE ImageID  = (?);
         `, [ImageID]);
