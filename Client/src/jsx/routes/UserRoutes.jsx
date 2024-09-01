@@ -12,18 +12,21 @@ import Subscribe from '../components/Subscribe';
 export default function UserRoutes() {
     return (
         <>
-            <NavigationBar/>
-            <div style={{height:'10vh', width:'100%'}}></div>
+            <NavigationBar />
+            <div style={{ height: '10vh', width: '100%' }}></div>
 
             <Routes>
                 <Route path="/subscribe" element={<Subscribe />} />
-                <Route path="/home" element={<HomePage />} />
+                <Route path="/home" element={localStorage.getItem('currentUser') === null ? (
+                    <Navigate to='/homepage' />) : (
+                    <HomePage />
+                )} />
                 <Route path="/personalarea" element={<PersonalArea />} />
                 <Route path="/catalog">
                     <Route index element={<CatalogPage />} />
                     <Route path=":bookid" element={<SingleBook />} />
                 </Route>
-
+                
                 <Route path="/" element={<Navigate to={`home`} />} />
                 <Route path="*" element={<FallBack />} />
             </Routes>
