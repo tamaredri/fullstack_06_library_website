@@ -43,7 +43,7 @@ function Search({ setList, fullList }) {
     }
 
     return <>
-        <div style={{ display: 'flex', margin: '2rem', alignItems: 'center' }}>
+        <div className={style.searchContainer}>
             <label className={style.searchLabel}> Title:
                 <input ref={titleSearch} onChange={Titlefilter} className={style.searchInput} type="text" />
             </label>

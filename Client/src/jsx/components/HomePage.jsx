@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate , useParams} from 'react-router-dom';
-
+import style from '../../css/HomePage.module.css'
 export default function HomePage() {
     const { userid } = useParams();
 
@@ -57,47 +57,42 @@ export default function HomePage() {
 
 
     return (
-        <div>
-            <h1>Welcome to the Homepage</h1>
-            {localStorage.getItem("currentUser") === null ? (
+        <div className={style.homePage}>
+            <h1 className={style.header}>Katzrin Library</h1>
+            <div className={style.imagasAndQuotes}>
+            {localStorage.getItem("currentUser") === null &&
                 <>
                     <button onClick={() => navigate('/login')}>Login</button>
                     <button onClick={() => navigate('/signup')}>Signup</button>
-                </>) : (
-                <>
-                    <button onClick={() => navigate(`/user/catalog`)}>Catalog</button>
-                    <button onClick={() => navigate(`/user/personalarea`)}>Personal Area</button>
                 </>
-            )}
+            }
 
 
             <div>
-                <h2>Image Slideshow</h2>
                 {images.length > 0 ? (
-                    <img
+                    <img className={style.LibraryImage}
                         src={images[currentImageIndex].ImagePath || "https://cdn-icons-png.flaticon.com/128/3038/3038089.png"}
                         alt="Slideshow"
-                        style={{ width: '100px', height: '100px', minWidth: '100px', minHeight: "100px" }}
                     />
                 ) : (
                     <img
+                        className={style.LibraryImage}
                         src={"https://cdn-icons-png.flaticon.com/128/3038/3038089.png"}
                         alt="Slideshow"
-                        style={{ width: '100px', height: '100px', minWidth: '100px', minHeight: "100px", margin: '0px' }}
                     />
                 )}
-            </div>
+                </div>
 
-            <div>
-                <h2>Quote Slideshow</h2>
-                {quotes.length > 0 ? (
-                    <blockquote>
-                        <p>"{quotes[currentQuoteIndex].Quote}"</p>
-                    </blockquote>
-                ) : (
-                    <p>No quotes to display</p>
-                )}
-            </div>
+                <div className={style.quotesContainer}>
+                    {quotes.length > 0 ? (
+                        <blockquote>
+                            <p>{quotes[currentQuoteIndex].Quote}</p>
+                        </blockquote>
+                    ) : (
+                        <p>No quotes to display</p>
+                    )}
+                </div>
+        </div>
         </div>
     );
 }

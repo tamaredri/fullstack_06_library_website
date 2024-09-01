@@ -1,0 +1,50 @@
+.homePage{
+    display: flex;
+    width: 100vw;
+    flex-direction: column;
+    align-items: center;
+}
+
+.imagasAndQuotes{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.header{
+    font-size: 2rem;
+    margin: 0.1rem;
+}
+
+.LibraryImage{
+    width: 80vw;
+    border: 1px solid black;
+    margin: 1rem;
+}
+
+.quotesContainer{
+    background-color: #D0E2E0;
+    width: 80vw;
+    border-radius: 10px;
+    font-size: 1.2rem;
+}
+
+
+@media screen and (min-width: 1024px) {
+    .imagasAndQuotes{
+        margin-top: 40px;
+        flex-direction: row;
+        justify-content: space-around;
+        width: 100vw;
+    }
+
+    .LibraryImage{
+        width: 50vw;
+        margin: 0;
+    }
+    
+    .quotesContainer{
+        width: 40vw;
+    }
+}
