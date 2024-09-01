@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate , useParams} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import style from '../../css/HomePage.module.css'
 export default function HomePage() {
     const { userid } = useParams();
@@ -36,51 +36,51 @@ export default function HomePage() {
     const [currentQuoteIndex, setCurrentQuoteIndex] = useState(1);
     const navigate = useNavigate();
 
-     useEffect(() => {
-       const imageInterval = setInterval(() => {
-         setCurrentImageIndex((prevIndex) =>
-           prevIndex === images.length - 1 ? 0 : prevIndex + 1
-         );
-       }, 5000); // Change image every 5 seconds
+    useEffect(() => {
+        const imageInterval = setInterval(() => {
+            setCurrentImageIndex((prevIndex) =>
+                prevIndex === images.length - 1 ? 0 : prevIndex + 1
+            );
+        }, 5000); // Change image every 5 seconds
 
-       const quoteInterval = setInterval(() => {
-         setCurrentQuoteIndex((prevIndex) =>
-           prevIndex === quotes.length - 1 ? 0 : prevIndex + 1
-         );
-       }, 10000); // Change quote every 10 seconds
+        const quoteInterval = setInterval(() => {
+            setCurrentQuoteIndex((prevIndex) =>
+                prevIndex === quotes.length - 1 ? 0 : prevIndex + 1
+            );
+        }, 10000); // Change quote every 10 seconds
 
-       return () => {
-         clearInterval(imageInterval);
-         clearInterval(quoteInterval);
-       };
-     }, [images, quotes]);
+        return () => {
+            clearInterval(imageInterval);
+            clearInterval(quoteInterval);
+        };
+    }, [images, quotes]);
 
 
     return (
         <div className={style.homePage}>
             <h1 className={style.header}>Katzrin Library</h1>
-            <div className={style.imagasAndQuotes}>
             {localStorage.getItem("currentUser") === null &&
-                <>
-                    <button onClick={() => navigate('/login')}>Login</button>
-                    <button onClick={() => navigate('/signup')}>Signup</button>
-                </>
+                <div>
+                    <button className={style.registration} onClick={() => navigate('/login')}>Login</button>
+                    <button className={style.registration} onClick={() => navigate('/signup')}>Signup</button>
+                </div>
             }
 
+            <div className={style.imagasAndQuotes}>
 
-            <div>
-                {images.length > 0 ? (
-                    <img className={style.LibraryImage}
-                        src={images[currentImageIndex].ImagePath || "https://cdn-icons-png.flaticon.com/128/3038/3038089.png"}
-                        alt="Slideshow"
-                    />
-                ) : (
-                    <img
-                        className={style.LibraryImage}
-                        src={"https://cdn-icons-png.flaticon.com/128/3038/3038089.png"}
-                        alt="Slideshow"
-                    />
-                )}
+                <div>
+                    {images.length > 0 ? (
+                        <img className={style.LibraryImage}
+                            src={images[currentImageIndex].ImagePath || "https://cdn-icons-png.flaticon.com/128/3038/3038089.png"}
+                            alt="Slideshow"
+                        />
+                    ) : (
+                        <img
+                            className={style.LibraryImage}
+                            src={"https://cdn-icons-png.flaticon.com/128/3038/3038089.png"}
+                            alt="Slideshow"
+                        />
+                    )}
                 </div>
 
                 <div className={style.quotesContainer}>
@@ -92,7 +92,7 @@ export default function HomePage() {
                         <p>No quotes to display</p>
                     )}
                 </div>
-        </div>
+            </div>
         </div>
     );
 }
