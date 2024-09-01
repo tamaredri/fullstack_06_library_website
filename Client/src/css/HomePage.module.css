@@ -3,6 +3,7 @@
     width: 100vw;
     flex-direction: column;
     align-items: center;
+    margin-top: 5rem;
 }
 
 .imagasAndQuotes{
@@ -28,6 +29,13 @@
     width: 80vw;
     border-radius: 10px;
     font-size: 1.2rem;
+}
+
+.registration{
+    margin: 1rem;
+    width: 10rem;
+    background-color: #294549;
+    color: #D0E2E0;
 }
 
 
