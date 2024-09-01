@@ -25,18 +25,18 @@ VALUES
 ('John Doe', '890-123-4567', '505 Walnut St, Central City', 'john@example.com', '2024-08-15');
 
 -- Inserting data into Books table
-INSERT INTO Books (Title, Author, Summary)
+INSERT INTO Books (Title, Author, Summary, ImagePath)
 VALUES
-('The Great Gatsby', 'F. Scott Fitzgerald', 'A story of the mysteriously wealthy Jay Gatsby and his love for Daisy Buchanan.'),
-('To Kill a Mockingbird', 'Harper Lee', 'A novel about the serious issues of rape and racial inequality.'),
-('1984', 'George Orwell', 'A dystopian novel set in a totalitarian society ruled by Big Brother.'),
-('Pride and Prejudice', 'Jane Austen', 'A romantic novel that also critiques the British landed gentry at the end of the 18th century.'),
-('Moby-Dick', 'Herman Melville', 'The narrative of Captain Ahab’s obsessive quest to kill the giant white sperm whale Moby Dick.'),
-('War and Peace', 'Leo Tolstoy', 'A historical novel that tells the story of five families during the Napoleonic Wars.'),
-('The Catcher in the Rye', 'J.D. Salinger', 'A novel about a teenage boy, Holden Caulfield, and his disillusionment with the world.'),
-('The Hobbit', 'J.R.R. Tolkien', 'A fantasy novel about the adventure of Bilbo Baggins in Middle-earth.'),
-('The Odyssey', 'Homer', 'An epic poem that tells the story of Odysseus’s journey home after the Trojan War.'),
-('The Divine Comedy', 'Dante Alighieri', 'An epic poem describing Dante’s journey through Hell, Purgatory, and Paradise.');
+('The Great Gatsby', 'F. Scott Fitzgerald', 'A story of the mysteriously wealthy Jay Gatsby and his love for Daisy Buchanan.', 'https://m.media-amazon.com/images/I/81QuEGw8VPL._AC_UF1000,1000_QL80_.jpg'),
+('To Kill a Mockingbird', 'Harper Lee', 'A novel about the serious issues of rape and racial inequality.', 'https://m.media-amazon.com/images/I/81aY1lxk+9L._AC_UF1000,1000_QL80_.jpg'),
+('1984', 'George Orwell', 'A dystopian novel set in a totalitarian society ruled by Big Brother.', 'https://m.media-amazon.com/images/I/61NAx5pd6XL._AC_UF1000,1000_QL80_.jpg'),
+('Pride and Prejudice', 'Jane Austen', 'A romantic novel that also critiques the British landed gentry at the end of the 18th century.', 'https://cdn.kobo.com/book-images/1a735d96-6075-4bca-87b7-15fb97ee50c7/1200/1200/False/pride-and-prejudice-216.jpg'),
+('Moby-Dick', 'Herman Melville', 'The narrative of Captain Ahab’s obsessive quest to kill the giant white sperm whale Moby Dick.', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRv_a5drcBj6Dqd5qdB17ByNunHIm6woW2pg&s'),
+('War and Peace', 'Leo Tolstoy', 'A historical novel that tells the story of five families during the Napoleonic Wars.', 'https://cdn.penguin.co.uk/dam-assets/books/9781849908467/9781849908467-jacket-large.jpg'),
+('The Catcher in the Rye', 'J.D. Salinger', 'A novel about a teenage boy, Holden Caulfield, and his disillusionment with the world.', 'https://s26162.pcdn.co/wp-content/uploads/sites/2/2018/07/the-catcher-in-the-rye-book-cover-movie-poster-art-3-nishanth-gopinathan-200x300.jpg'),
+('The Hobbit', 'J.R.R. Tolkien', 'A fantasy novel about the adventure of Bilbo Baggins in Middle-earth.', 'https://m.media-amazon.com/images/I/71S7Z+YhJFL._AC_UF1000,1000_QL80_.jpg'),
+('The Odyssey', 'Homer', 'An epic poem that tells the story of Odysseus’s journey home after the Trojan War.', 'https://m.media-amazon.com/images/I/81g0AATkO9L._AC_UF350,350_QL50_.jpg'),
+('The Divine Comedy', 'Dante Alighieri', 'An epic poem describing Dante’s journey through Hell, Purgatory, and Paradise.', 'https://m.media-amazon.com/images/I/51i-9SGWr-L._AC_UF1000,1000_QL80_.jpg');
 
 -- Inserting data into BookCopies table
 INSERT INTO BookCopies (BookID)
@@ -82,3 +82,8 @@ VALUES
 ('Call me Ishmael.'),
 ('A journey of a thousand miles begins with a single step.'),
 ('To infinity and beyond!');
+
+-- Inserting data into LibraryImages table
+INSERT INTO LibraryImages (ImagePath)
+VALUES
+(NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL);

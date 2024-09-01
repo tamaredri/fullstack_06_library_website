@@ -8,7 +8,6 @@ import blackBook from '../../icon/blackBook.png'
 
 function SingleBook() {
 
-  const navigate = useNavigate();
   const { bookid } = useParams();
   const userName = localStorage.getItem('currentUser');
 
@@ -138,7 +137,7 @@ function SingleBook() {
             </div>
             <div className={style.imageAndSummaryContainer}>
               <img className={style.bookImage}
-                src={bookImage || bookInfo.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'}
+                src={bookInfo.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'}
                 alt={`Cover of ${bookInfo.Title}`} />
 
               <div className={style.SummaryContainer}>Summary:
