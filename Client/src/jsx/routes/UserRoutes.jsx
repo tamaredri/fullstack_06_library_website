@@ -1,6 +1,5 @@
 import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom';
-import UserHome from '../components/UserHome';
 import CatalogPage from '../components/CatalogPage';
 import SingleBook from '../components/SingleBook';
 import HomePage from '../components/HomePage';
