@@ -56,7 +56,6 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
                 throw new Error(errorText);
             }
 
-            console.log(updatedData);
             setIsInfoUpdated(false);
             setUserData(updatedData);
             checkIsSubscriptionExpired();
@@ -76,6 +75,19 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
         userData.SubscriptionExpiration = date.toISOString();
 
         handleUpdateUserInfo();
+    }
+
+    function checkIsSubscriptionExpired() {
+        if (isSubscribed) {
+            // Check subscription status
+            const currentDate = new Date();
+            const expirationDate = new Date(userData.SubscriptionExpiration);
+            if (expirationDate < currentDate) {
+                setIsSubscriptionExpired(true);
+            }
+            else
+                setIsSubscriptionExpired(false);
+        }
     }
 
     return (
@@ -134,6 +146,8 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
                             <button className={style.updateBotton} onClick={handleUpdateUserInfo} disabled={!isInfoUpdated}>
                             Update
                             </button>
+                            {load && <div className={style.blur_overlay}></div>}
+                            {load && <div className={style.success_animation}>✔</div>}
                         </div>
                         
                     </div>
@@ -168,21 +182,7 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
                 </div>
             )}
 
-            {load && <div className={style.blur_overlay}></div>}
-            {load && <div className={style.success_animation}>✔</div>}
+
         </div>
     )
-
-    function checkIsSubscriptionExpired() {
-        if (isSubscribed) {
-            // Check subscription status
-            const currentDate = new Date();
-            const expirationDate = new Date(userData.SubscriptionExpiration);
-            if (expirationDate < currentDate) {
-                setIsSubscriptionExpired(true);
-            }
-            else
-                setIsSubscriptionExpired(false);
-        }
-    }
 }
