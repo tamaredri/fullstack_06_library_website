@@ -2,7 +2,7 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  
+  font-size: 16;
   color-scheme: light;
   color: #213547;
   background-color: #E1EDEB;
@@ -53,6 +53,11 @@ button {
   transition: border-color 0.25s;
 }
 
+@media screen and (min-width: 1024px) {
+  :root {
+    font-size: 20px;
+  }
+}
 
 
 

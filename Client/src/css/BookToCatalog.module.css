@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 11rem;
+    height: 13rem;
     width: 9rem;
     margin-bottom: 10px;
     padding: 10px;
@@ -12,7 +12,7 @@
 }
 
 .bookImage {
-    height: 7rem;
+    height: 9rem;
     width: 7rem;
     border: 1px solid black;
     cursor: pointer;
