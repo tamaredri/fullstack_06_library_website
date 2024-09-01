@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import BookToCatalog from './BookToCatalog';
 import style from './../../css/CatalogPage.module.css';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 import up from '../../icon/up.png'
 import down from '../../icon/down.png'
 
 import { useRef } from 'react';
 
-function Search( { setList, fullList }){
+function Search({ setList, fullList }) {
 
     const titleSearch = useRef("");
     const authorSearch = useRef("");
 
-    function Titlefilter(){
+    function Titlefilter() {
         authorSearch.current.value = "";
-        setList(l=>fullList.filter(book=>book.Title.toLowerCase().includes(titleSearch.current.value.toLowerCase())));
+        setList(l => fullList.filter(book => book.Title.toLowerCase().includes(titleSearch.current.value.toLowerCase())));
     }
-    function Authotfilter(){
+    function Authotfilter() {
         titleSearch.current.value = "";
-        setList(l=>fullList.filter(book=>book.Author.toLowerCase().includes(authorSearch.current.value.toLowerCase())));
+        setList(l => fullList.filter(book => book.Author.toLowerCase().includes(authorSearch.current.value.toLowerCase())));
     }
 
     function Sort(direction) {
@@ -27,7 +27,7 @@ function Search( { setList, fullList }){
             const sortedList = [...l].sort((b1, b2) => {
                 const titleA = b1.Title.toLowerCase();
                 const titleB = b2.Title.toLowerCase();
-    
+
                 if (direction === 'up') {
                     if (titleA < titleB) return -1;
                     if (titleA > titleB) return 1;
@@ -43,17 +43,17 @@ function Search( { setList, fullList }){
     }
 
     return <>
-        <div style={{display:'flex', margin:'2rem', alignItems:'center'}}>
+        <div style={{ display: 'flex', margin: '2rem', alignItems: 'center' }}>
             <label className={style.searchLabel}> Title:
-                <input ref={titleSearch} onChange={Titlefilter} className={style.searchInput} type="text"/>
+                <input ref={titleSearch} onChange={Titlefilter} className={style.searchInput} type="text" />
             </label>
             <label className={style.searchLabel} > Author:
-                <input ref={authorSearch} onChange={Authotfilter} className={style.searchInput} type="text"/>
+                <input ref={authorSearch} onChange={Authotfilter} className={style.searchInput} type="text" />
             </label>
-            <label  className={style.searchLabel}> Sort:
-                <div style={{display: 'flex', flexDirection:'column'}}>
-                    <img onClick={()=>Sort('up')} style={{width: 11, marginLeft:6}} src={up} alt="" />
-                    <img onClick={()=>Sort('down')} style={{width: 11, marginLeft:6}} src={down} alt="" />
+            <label className={style.searchLabel}> Sort:
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <img onClick={() => Sort('up')} style={{ width: 11, marginLeft: 6 }} src={up} alt="" />
+                    <img onClick={() => Sort('down')} style={{ width: 11, marginLeft: 6 }} src={down} alt="" />
                 </div>
             </label>
         </div>
@@ -72,52 +72,59 @@ function CatalogPage() {
     const userName = localStorage.getItem('currentUser');
 
     useEffect(() => {
-        fetch('http://localhost:3000/library/books', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(async (res) => {
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(errorText);
-            }
-            return res.json();
-        })
-        .then((books) => {
-            setBooks(books);
-            setPresentBooks(books);
-        })
-        .catch((error) => {
-            navigate(`/NotFound`);
-        });
+        const fetchBooks = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/library/books', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-        // Fetch favorite books
-        fetch(`http://localhost:3000/library/favoriteBooks/${userName}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+
+                const data = await response.json();
+                setBooks(data);
+                setPresentBooks(data);
             }
-        })
-        .then(async (res) => {
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(errorText);
+            catch (error) {
+                console.error(error)
             }
-            return res.json();
-        })
-        .then((favoriteBooks) => {
-            setFavoriteBooks(favoriteBooks.map(book => book.BookID));
-        })
-        .catch((error) => {
-            navigate(`/NotFound`);
-        });
-        
+        }
+
+        const fetchFavorites = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/library/favoriteBooks/${userName}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+
+                const data = await response.json();
+
+                setFavoriteBooks(data.map(book => book.BookID))
+            }
+            catch (error) {
+                console.error(error)
+            }
+        }
+
+        fetchBooks();
+        fetchFavorites();
+
     }, []);
 
 
-    function toggleFavorite (bookID) {
+    function toggleFavorite(bookID) {
         setFavoriteBooks((prevFavorites) => {
             if (prevFavorites.includes(bookID)) {
                 deleteAsFavorite(bookID);
@@ -129,62 +136,76 @@ function CatalogPage() {
         });
     };
 
-    function postAsFavorite(BookID){
-        fetch(`http://localhost:3000/library/favoriteBooks/${userName}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ BookID: BookID })
-        })
-        .then(async (res) => {
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(errorText);
+    function postAsFavorite(BookID) {
+        const post = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/library/favoriteBooks/${userName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ BookID: BookID })
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
             }
-        })
-        .catch((error) => {
-            navigate("NotFound");
-        });
+            catch (error) {
+                console.error(error);
+            }
+        }
+        post();
     }
 
-    function deleteAsFavorite(BookID){
-        fetch(`http://localhost:3000/library/favoriteBooks/${userName}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ BookID: BookID })
-        })
-        .then(async (res) => {
-            if (!res.ok) {
-                const errorText = await res.text();
-                throw new Error(errorText);
+    function deleteAsFavorite(BookID) {
+        const deleteFavorite = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/library/favoriteBooks/${userName}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ BookID: BookID })
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
             }
-        })
-        .catch((error) => {
-            navigate("/NotFound");
-        });
-    
+            catch (error) {
+                console.error(error);
+            }
+        }
+
+        deleteFavorite();
     }
 
     return <div className={style.catalogPage}>
-        <Search setList={setPresentBooks} fullList={books}/>
-        <div style={{display:'flex', justifyContent:'center', flexDirection:'row', flexWrap: 'wrap'}}>
-            {presentBooks.map((book) => (
-                <BookToCatalog
-                    key={book.BookID}
-                    BookID={book.BookID}
-                    Title={book.Title}
-                    Author={book.Author}
-                    ImagePath={book.ImagePath}
-                    isFavorite={favoriteBooks.includes(book.BookID)}
-                    setIsFavorite={() => toggleFavorite(book.BookID)}
-                    navigate={navigate}
-                />
-            ))}
-        </div>
-        </div>;
+
+        {localStorage.getItem('currentUser') === null ?
+            (<Navigate to='/homepage' />) :
+            (
+                <>
+                    <Search setList={setPresentBooks} fullList={books} />
+                    <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'row', flexWrap: 'wrap' }}>
+                        {presentBooks.map((book) => (
+                            <BookToCatalog
+                                key={book.BookID}
+                                BookID={book.BookID}
+                                Title={book.Title}
+                                Author={book.Author}
+                                ImagePath={book.ImagePath}
+                                isFavorite={favoriteBooks.includes(book.BookID)}
+                                setIsFavorite={() => toggleFavorite(book.BookID)}
+                                navigate={navigate}
+                            />
+                        ))}
+                    </div>
+                </>
+
+            )}
+    </div>;
 }
 
 export default CatalogPage;

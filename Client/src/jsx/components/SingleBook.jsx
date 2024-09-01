@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import style from '../../css/SingleBook.module.css'
 import bookImage from '../../icon/book.jpg'
@@ -30,7 +30,6 @@ function SingleBook() {
         getBookCopies(bookResponse.BookID, bookResponse);
       } catch (error) {
         console.error('Error fetching user data:', error);
-        navigate(`/NotFound`);
       }
     };
 
@@ -55,7 +54,6 @@ function SingleBook() {
 
       } catch (error) {
         console.error('Error fetching user data:', error);
-        navigate(`/NotFound`);
       }
     };
 
@@ -131,45 +129,50 @@ function SingleBook() {
       alignItems: 'center',
       justifyContent: 'center'
     }}>
-      <div className={style.header}>
-        <span style={{ color: "#294549" }}>---</span> {bookInfo.Title} {bookInfo.Author || "unknown"} <span style={{ color: "#294549" }}>---</span>
-      </div>
-      <div className={style.imageAndSummaryContainer}>
-        <img className={style.bookImage}
-          src={bookImage || bookInfo.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'}
-          alt={`Cover of ${bookInfo.Title}`} />
 
-        <div className={style.SummaryContainer}>Summary:
-          <p className={style.SummaryP}>{bookInfo.Summary || "unknown"}</p>
-        </div>
-      </div>
+      {localStorage.getItem('currentUser') === null ? (<Navigate to='/homepage' />) :
+        (
+          <>
+            <div className={style.header}>
+              <span style={{ color: "#294549" }}>---</span> {bookInfo.Title} {bookInfo.Author || "unknown"} <span style={{ color: "#294549" }}>---</span>
+            </div>
+            <div className={style.imageAndSummaryContainer}>
+              <img className={style.bookImage}
+                src={bookImage || bookInfo.ImagePath || 'https://cdn-icons-png.flaticon.com/128/2232/2232688.png'}
+                alt={`Cover of ${bookInfo.Title}`} />
 
-      <div className={style.hr}></div>
-
-      {isSubscribed &&
-        <button
-          className={style.borrowButtun}
-          onClick={BorrowBook}
-          disabled={!isCopyAvailable}
-
-        >BORROW</button>}
-
-      {bookInfo.copies.length > 0 ? (
-        <ul className={style.bookList}>
-          {bookInfo.copies.map(copy => (
-            <li className={style.bookInList} key={copy.CopyID}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span><strong>Copy ID:</strong> {copy.CopyID}</span>
-                <span><strong>Status:</strong> {copy.Status}</span>
+              <div className={style.SummaryContainer}>Summary:
+                <p className={style.SummaryP}>{bookInfo.Summary || "unknown"}</p>
               </div>
+            </div>
 
-              <img className={style.blackBook} src={blackBook} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No copies were found or data not loaded yet.</p>
-      )}
+            <div className={style.hr}></div>
+
+            {isSubscribed &&
+              <button
+                className={style.borrowButtun}
+                onClick={BorrowBook}
+                disabled={!isCopyAvailable}
+
+              >BORROW</button>}
+
+            {bookInfo.copies.length > 0 ? (
+              <ul className={style.bookList}>
+                {bookInfo.copies.map(copy => (
+                  <li className={style.bookInList} key={copy.CopyID}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span><strong>Copy ID:</strong> {copy.CopyID}</span>
+                      <span><strong>Status:</strong> {copy.Status}</span>
+                    </div>
+
+                    <img className={style.blackBook} src={blackBook} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No copies were found.</p>
+            )}
+          </>)}
     </div>
   )
 }
