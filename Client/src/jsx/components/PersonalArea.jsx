@@ -3,6 +3,8 @@ import { useParams, Navigate } from 'react-router-dom';
 import FavoriteBooks from './FavoriteBooks';
 import BorrowedBooks from './BorrowedBooks';
 import UserInfo from './UserInfo';
+import style from '../../css/PersonalArea.module.css'
+
 
 export default function PersonalArea() {
   const userid = localStorage.getItem('currentUser');
@@ -46,20 +48,23 @@ export default function PersonalArea() {
   return (
     <div>
       {userid === null ? (<Navigate to='/homepage' />) : (
-        <>
-          <h2>Hey, {userData.Name} </h2>
-          {errorMessage && <p>Error: {errorMessage}</p>}
+        <div style={{display: 'flex', flexDirection:'column', alignItems:'center'}}>
+            {errorMessage && <p>Error: {errorMessage}</p>}
 
-          <UserInfo userData={userData}
-            setUserData={setUserData}
-            isSubscribed={isSubscribed}
-            isSubscriptionExpired={isSubscriptionExpired}
-            setIsSubscriptionExpired={setIsSubscriptionExpired} />
+            <UserInfo userData={userData}
+              setUserData={setUserData}
+              isSubscribed={isSubscribed}
+              isSubscriptionExpired={isSubscriptionExpired}
+              setIsSubscriptionExpired={setIsSubscriptionExpired} />
 
-          <FavoriteBooks userid={userid} setError={setErrorMessage} />
+            <div className={style.hr}></div>
 
-          {isSubscribed && <BorrowedBooks userid={userid} setError={setErrorMessage} />}
-        </>
+            <FavoriteBooks userid={userid} setError={setErrorMessage} />
+
+            <div className={style.hr}></div>
+
+            {isSubscribed && <BorrowedBooks userid={userid} setError={setErrorMessage} />}
+        </div>
       )}
     </div>
   );

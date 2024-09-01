@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import style from '../../css/FavoriteBorrowBooks.module.css'
 
 export default function BorrowedBooks({ userid }) {
     const [borrowedBooks, setBorrowedBooks] = useState([]);
@@ -44,15 +45,15 @@ export default function BorrowedBooks({ userid }) {
     };
 
     return (
-        <div>
+        <>
             {borrowedBooks.length > 0 && (
                 <>
-                    <h3>Books Borrowed</h3>
-                    <ul>
+                    <h3 className={style.favoriteHeader}>Books Borrowed</h3>
+                    <ul className={style.bookList}>
                         {borrowedBooks.map((book) => (
-                            <li key={book.BorrowID}>
-                                {book.Title}
-                                <button onClick={() => handleReturnBook(book.BorrowID)}>
+                            <li className={style.bookInList} key={book.BorrowID}>
+                                <span>{book.Title}</span>
+                                <button className={style.returnBurron} onClick={() => handleReturnBook(book.BorrowID)}>
                                     Return Book
                                 </button>
                             </li>
@@ -60,6 +61,6 @@ export default function BorrowedBooks({ userid }) {
                     </ul>
                 </>
             )}
-        </div>
+        </>
     )
 }

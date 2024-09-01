@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import style from '../../css/FavoriteBorrowBooks.module.css'
 
 export default function FavoriteBooks({ userid, setError }) {
   const [favorites, setFavorites] = useState([]);
@@ -23,19 +24,20 @@ export default function FavoriteBooks({ userid, setError }) {
   }, []);
 
   return (
-    <div>
+    <>
       {favorites.length > 0 && (
         <>
-          <h3>Favorite Books</h3>
-          <ul>
+          <h3 className={style.favoriteHeader}>Favorite Books</h3>
+
+          <ul className={style.bookList}>
             {favorites.map((book) => (
-              <li key={book.BookID}><div>
-                {book.Title}
-                <img src={book.ImagePath || "https://cdn-icons-png.flaticon.com/128/2232/2232688.png"} style={{ maxWidth: '50px' }} />
-              </div></li>
+              <li className={style.bookInList} key={book.BookID}>
+                  <span>{book.Title}</span>
+                  <img className={style.bookIcon} src={book.ImagePath || "https://cdn-icons-png.flaticon.com/128/2232/2232688.png"} style={{ maxWidth: '50px' }} />
+              </li>
             ))}
           </ul>
         </>)}
-    </div>
+    </>
   )
 }

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import style from './../../css/SignupPage.module.css'
+import style from './../../css/Subscribe.module.css'
 
 
 export default function Subscribe({ userData }) {
@@ -66,7 +66,7 @@ export default function Subscribe({ userData }) {
         subscribeUser();
     }
 
-    return <>
+    return <div style={{display: 'flex', flexDirection:'column', alignItems:'center'}}>
         <p>
             {userid},
         </p>
@@ -75,8 +75,6 @@ export default function Subscribe({ userData }) {
         </p>
 
         <form className={style.register_form} onSubmit={submitSubscription}>
-            <section className={style.user_info}>
-                <div className={style.inputs_container}>
                     <input className={style.register_input}
                         ref={phone}
                         id="phone"
@@ -96,9 +94,8 @@ export default function Subscribe({ userData }) {
                         placeholder="Address"
                         required />
 
-                    <p>select your subscription length:</p>
+                    <p style={{width: 'fit-content'}}>select your subscription length:</p>
 
-                    <div>
                         <label>
                             <input
                                 type="radio"
@@ -109,8 +106,6 @@ export default function Subscribe({ userData }) {
                             />
                             1 Month
                         </label>
-                    </div>
-                    <div>
                         <label>
                             <input
                                 type="radio"
@@ -120,8 +115,6 @@ export default function Subscribe({ userData }) {
                             />
                             3 Months
                         </label>
-                    </div>
-                    <div>
                         <label>
                             <input
                                 type="radio"
@@ -131,9 +124,6 @@ export default function Subscribe({ userData }) {
                             />
                             6 Months
                         </label>
-                    </div>
-                </div>
-            </section>
 
             <input className={`${style.register_input} ${style.submit}`}
                 type="submit"
@@ -143,5 +133,5 @@ export default function Subscribe({ userData }) {
 
         {load && <div className={style.blur_overlay}></div>}
         {load && <div className={style.success_animation}>✔</div>}
-    </>
+    </div>
 }

@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import style from '../../css/UserInfo.module.css'
+import userIcon from '../../icon/user.png'
 
 export default function UserInfo({ userData, setUserData, isSubscribed, isSubscriptionExpired, setIsSubscriptionExpired }) {
     const navigate = useNavigate();
@@ -73,74 +75,91 @@ export default function UserInfo({ userData, setUserData, isSubscribed, isSubscr
     return (
         <div>
             {!isSubscribed ? (
-                <>
+                <div style={{display: 'flex', flexDirection:'column', alignItems:'center'}}>
+                    <div className={style.infoContainer}>
+                        <img className={style.userImage} src={userIcon}/>
+                        <div  className={style.infoField}>
+                                <label className={style.infoFieldLabel}>Name: </label>
+                                {userData.Name}
+                        </div>
+                    </div>
                     <p>Your are not subscribed.</p>
-                    <button onClick={() => navigate(`/user/subscribe`)}>
+                    <button className={style.updateBotton} onClick={() => navigate(`/user/subscribe`)}>
                         Subscribe
                     </button>
-                </>
+                </div>
             ) : (
-                <>
-                    <h3>Your Information</h3>
-                    <p>
-                        <label>Name: </label>
-                        {userData.Name}
-                    </p>
-                    <div>
-                        <label>Phone:</label>
-                        <input
-                            type="text"
-                            defaultValue={userData.Phone}
-                            ref={phoneRef}
-                            onBlur={checkForChanges}
-                        />
+                <div style={{display: 'flex', flexDirection:'column', alignItems:'center'}}>
+                    <div className={style.infoContainer}>
+                        <img className={style.userImage} src={userIcon}/>
+                        <div>
+                            <div className={style.infoField}>
+                            <label className={style.infoFieldLabel}>Name: </label>
+                            {userData.Name}
+                            </div>
+                            <div className={style.infoField}>
+                                <label className={style.infoFieldLabel}>Phone:</label>
+                                <input 
+                                    type="text"
+                                    defaultValue={userData.Phone}
+                                    ref={phoneRef}
+                                    onBlur={checkForChanges}
+                                />
+                            </div>
+                        
+                            <div className={style.infoField}>
+                                <label className={style.infoFieldLabel}>Address:</label>
+                                <input
+                                    type="text"
+                                    defaultValue={userData.Address}
+                                    ref={addressRef}
+                                    onBlur={checkForChanges}
+                                />
+                            </div>
+                            <div className={style.infoField}>
+                                <label className={style.infoFieldLabel}>Email:</label>
+                                <input
+                                    type="text"
+                                    defaultValue={userData.Email}
+                                    ref={emailRef}
+                                    onBlur={checkForChanges}
+                                />
+                            </div>
+                            <button className={style.updateBotton} onClick={handleUpdateUserInfo} disabled={!isInfoUpdated}>
+                            Update
+                            </button>
+                        </div>
+                        
                     </div>
-                    <div>
-                        <label>Address:</label>
-                        <input
-                            type="text"
-                            defaultValue={userData.Address}
-                            ref={addressRef}
-                            onBlur={checkForChanges}
-                        />
-                    </div>
-                    <div>
-                        <label>Email:</label>
-                        <input
-                            type="text"
-                            defaultValue={userData.Email}
-                            ref={emailRef}
-                            onBlur={checkForChanges}
-                        />
-                    </div>
-                    <button onClick={handleUpdateUserInfo} disabled={!isInfoUpdated}>
-                        Update Information
-                    </button>
+
+                    <div className={style.hr}></div>
+                    
 
                     {isSubscriptionExpired ? (
                         <>
                             {/* select subscription length */}
-                            <p>Your subscription has expired. renew:</p>
-                            <button onClick={() => handleUpdateExpirationDate(1)}>
-                                1 month
-                            </button>
-                            <button onClick={() => handleUpdateExpirationDate(3)}>
-                                3 months
-                            </button>
-                            <button onClick={() => handleUpdateExpirationDate(6)}>
-                                6 months
-                            </button>
+                            <p style={{marginTop: 0}}>Your subscription has expired. renew:</p>
+                            <div style={{display: 'flex', flexDirection:'row', alignItems:'center'}}>
+                                <button className={style.standartButton} onClick={() => handleUpdateExpirationDate(1)}>
+                                    1 month
+                                </button>
+                                <button className={style.standartButton} onClick={() => handleUpdateExpirationDate(3)}>
+                                    3 months
+                                </button>
+                                <button className={style.standartButton} onClick={() => handleUpdateExpirationDate(6)}>
+                                    6 months
+                                </button>
+                            </div>
                         </>
                     ) : (
-                        <div>
-                            <label>Subscription Expiration Date:</label>
-                            <p></p>
-                            {userData.SubscriptionExpiration.split('T')[0]}
+                        <div style={{textAlign: 'center'}}>
+                            <h3 style={{marginTop: 0}}>Subscription Expiration Date:</h3>
+                            <span>{userData.SubscriptionExpiration.split('T')[0]}</span>
                         </div>
                     )}
 
 
-                </>
+                </div>
             )}
         </div>
     )

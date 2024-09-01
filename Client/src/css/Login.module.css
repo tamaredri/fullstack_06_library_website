@@ -37,6 +37,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    height: 100vh;
 }
 
 .log_in_input_container .login_input{
